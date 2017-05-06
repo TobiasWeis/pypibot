@@ -1,7 +1,7 @@
 # PyPiBot
 
 A robot that is controlled by python on a raspberry pi.
-The build will be rover-like, with four driven wheels.
+The build is rover-like, with four driven wheels.
 
 ![PyPiBot](0001.png)
 
@@ -16,4 +16,10 @@ The build will be rover-like, with four driven wheels.
 * Tires: 4x GoolRC 1:10 Drift Car Tires
 * Tire-mount: 12mm Hex Wheel Adapter for 4mm shaft
 
-
+## Software
+Not yet finished, proposed:
+* Python mainloop with subprocesses for motor/sensor/worldmodel/reasoning control
+* Motor control: GPIO interfaced with motor-module, speed via PWM-implemention of pyGPIO
+* Sensing: camera + ultrasonic modules
+* Worldmodel: 2D-map of environment
+* Reasoning: Obstacle avoidance, object-tracking, self-loading and finding base
