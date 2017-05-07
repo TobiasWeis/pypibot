@@ -6,6 +6,7 @@ The build is rover-like, with four driven wheels.
 ![PyPiBot](0001.png)
 
 ## Parts-List
+Whenever available, detailed information and supplier-link are provided as pdf in the docs-folder.
 * Raspberry-Pi B+ V2
 * Edimax EW-7811UN Wireless USB Adapter
 
@@ -26,5 +27,8 @@ Basic module structure finished:
 
 TODO:
 * Define datatypes and interfaces (messages) for inter-process-communication
+* Think about synchronization (in terms of time, perception/action cycle, etc.)
+* How to organize perceptions, who marks them as read/removes them from the dictionary?
+* Implement logging
 
 ![Classes](./docs/diagrams/classes.png)
