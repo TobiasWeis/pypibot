@@ -23,3 +23,5 @@ Not yet finished, proposed:
 * Sensing: camera + ultrasonic modules
 * Worldmodel: 2D-map of environment
 * Reasoning: Obstacle avoidance, object-tracking, self-loading and finding base
+
+![Classes](./docs/diagrams/classes.png)
