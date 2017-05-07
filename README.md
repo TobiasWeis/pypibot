@@ -4,6 +4,7 @@ A robot that is controlled by python on a raspberry pi.
 The build is rover-like, with four driven wheels.
 
 ![PyPiBot](0001.png)
+![PyPiBotGif](./docs/bot.gif)
 
 ## Parts-List
 Whenever available, detailed information and supplier-link are provided as pdf in the docs-folder.
