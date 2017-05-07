@@ -16,6 +16,9 @@ The build is rover-like, with four driven wheels.
 * Tires: 4x GoolRC 1:10 Drift Car Tires
 * Tire-mount: 12mm Hex Wheel Adapter for 4mm shaft
 
+Current hardware configuration:
+![PyPiBotSchematic](./docs/diagrams/PyPiBot_Steckplatine.png)
+
 ## Software
 Basic module structure finished:
 * Python mainloop with subprocesses for motor/sensor/worldmodel/reasoning control
