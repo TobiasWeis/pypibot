@@ -2,7 +2,7 @@ import cv2
 from MP import MP
 
 class CAM(MP):
-    def defvars(self):
+    def init(self):
         self.objseen = False
 
     def run_impl(self):

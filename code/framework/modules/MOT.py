@@ -7,7 +7,7 @@ M1B = 5
 M1E = 7
 
 class MOT(MP):
-    def defvars(self):
+    def init(self):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(M1A, GPIO.OUT)

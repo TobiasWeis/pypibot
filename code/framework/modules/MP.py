@@ -10,7 +10,7 @@ class MP(multiprocessing.Process):
 
     def run(self):
         # let the class define some of its class-specific variables
-        self.defvars()
+        self.init()
 
         while not self.md["shutdown"]:
             print self.name
@@ -22,8 +22,8 @@ class MP(multiprocessing.Process):
     def run_impl(self):
         raise NotImplementedError
 
-    def defvars(self):
-        print self.name," - Defvars"
+    def init(self):
+        print self.name," - Init"
         pass
 
     def cleanup(self):
