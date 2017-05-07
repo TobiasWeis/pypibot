@@ -17,11 +17,14 @@ The build is rover-like, with four driven wheels.
 * Tire-mount: 12mm Hex Wheel Adapter for 4mm shaft
 
 ## Software
-Not yet finished, proposed:
+Basic module structure finished:
 * Python mainloop with subprocesses for motor/sensor/worldmodel/reasoning control
-* Motor control: GPIO interfaced with motor-module, speed via PWM-implemention of pyGPIO
-* Sensing: camera + ultrasonic modules
-* Worldmodel: 2D-map of environment
-* Reasoning: Obstacle avoidance, object-tracking, self-loading and finding base
+* CAM: Sensing: camera + ultrasonic modules
+* MEM: Worldmodel: 2D-map of environment
+* BRAIN: Reasoning: Obstacle avoidance, object-tracking, self-loading and finding base
+* MOT: Motor control: GPIO interfaced with motor-module, speed via PWM-implemention of pyGPIO
+
+TODO:
+* Define datatypes and interfaces (messages) for inter-process-communication
 
 ![Classes](./docs/diagrams/classes.png)
