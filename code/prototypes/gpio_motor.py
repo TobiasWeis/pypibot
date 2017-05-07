@@ -27,4 +27,4 @@ for i in range(10,101,10):
 GPIO.output(3, GPIO.LOW)
 GPIO.output(5, GPIO.LOW)
 
-GPIO.clenaup()
+GPIO.cleanup()
