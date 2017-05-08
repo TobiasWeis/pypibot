@@ -2,24 +2,62 @@ from MP import MP
 import RPi.GPIO as GPIO
 import time
 
-M1A = 3
-M1B = 5
-M1E = 7
+'''
+this class should abstract the motor commands,
+so that the rest of the framework can issue
+move commands like
+move(angle, distance)
+'''
+
+class Motor():
+    def __init__(self,a,b,e):
+        self.a = a
+        self.b = b
+        self.e = e
+
+        GPIO.setup(self.a, GPIO.OUT)
+        GPIO.setup(self.b, GPIO.OUT)
+        GPIO.setup(self.e, GPIO.OUT)
+
+        self.set_mode("release")
+
+        # setup PWM on enable port
+        self.p = GPIO.PWM(self.e, 100)
+        self.p.start(0)
+
+    def set_mode(self, d):
+        if d == "back":
+            GPIO.output(self.m1a, GPIO.HIGH)
+            GPIO.output(self.m1b, GPIO.LOW)
+        elif d == "forward":
+            GPIO.output(self.m1a, GPIO.LOW)
+            GPIO.output(self.m1b, GPIO.HIGH)
+        elif d == "block":
+            GPIO.output(self.m1a, GPIO.HIGH)
+            GPIO.output(self.m1b, GPIO.HIGH)
+        elif d == "release":
+            GPIO.output(self.m1a, GPIO.LOW)
+            GPIO.output(self.m1b, GPIO.LOW)
+        else:
+            print "Motor: I do not know this direction"
+
+    def set_speed(self,speed):
+        self.p.ChangeDutyCycle(speed)
+
+    def cleanup(self):
+        self.set_speed(0)
+        self.set_mode("release")
 
 class MOT(MP):
     def init(self):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(M1A, GPIO.OUT)
-        GPIO.setup(M1B, GPIO.OUT)
-        GPIO.setup(M1E, GPIO.OUT)
 
-        GPIO.output(3, GPIO.LOW)
-        GPIO.output(5, GPIO.HIGH)
-
-        self.p = GPIO.PWM(M1E, 100)
-        self.p.start(0)
-
+        self.motor1 = Motor(
+                        config.getint("PINS", "MOTOR1A"),
+                        config.getint("PINS", "MOTOR1B"),
+                        config.getint("PINS", "MOTOR1E")
+                        )
 
     def run_impl(self):
         if len(self.md["Move"]) == 2:
@@ -27,21 +65,13 @@ class MOT(MP):
             speed = self.md["Move"][0]
             angle = self.md["Move"][1]
             self.md["Move"] = []
-            self.move(speed, angle)
+            self.motor1.set_mode("forward")
+            self.motor1.set_speed(speed)
+            time.sleep(2)
+            self.motor1.set_speed(0)
+            self.motor1.set_mode("release")
             print self.name, " - MOVING DONE!"
 
-    def move(self, speed, angle):
-        # currently only one motor is working,
-        # so we just set the speed
-        #
-        # also, we need to read encoders to check whether we travelled the distance or not
-        # currently: just move for 1 second
-        self.p.ChangeDutyCycle(speed)
-        time.sleep(2)
-        self.p.ChangeDutyCycle(0)
-
     def cleanup(self):
-        GPIO.output(3, GPIO.LOW)
-        GPIO.output(5, GPIO.LOW)
-
+        self.motor1.cleanup()
         GPIO.cleanup()
