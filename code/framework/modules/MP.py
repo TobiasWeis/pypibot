@@ -6,6 +6,7 @@ class MP(multiprocessing.Process):
     def __init__(self, name, config, md):
         multiprocessing.Process.__init__(self)
         self.name = name
+        self.config = config
         self.md = md
 
     def run(self):

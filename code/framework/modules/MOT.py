@@ -27,17 +27,17 @@ class Motor():
 
     def set_mode(self, d):
         if d == "back":
-            GPIO.output(self.m1a, GPIO.HIGH)
-            GPIO.output(self.m1b, GPIO.LOW)
+            GPIO.output(self.a, GPIO.HIGH)
+            GPIO.output(self.b, GPIO.LOW)
         elif d == "forward":
-            GPIO.output(self.m1a, GPIO.LOW)
-            GPIO.output(self.m1b, GPIO.HIGH)
+            GPIO.output(self.a, GPIO.LOW)
+            GPIO.output(self.b, GPIO.HIGH)
         elif d == "block":
-            GPIO.output(self.m1a, GPIO.HIGH)
-            GPIO.output(self.m1b, GPIO.HIGH)
+            GPIO.output(self.a, GPIO.HIGH)
+            GPIO.output(self.b, GPIO.HIGH)
         elif d == "release":
-            GPIO.output(self.m1a, GPIO.LOW)
-            GPIO.output(self.m1b, GPIO.LOW)
+            GPIO.output(self.a, GPIO.LOW)
+            GPIO.output(self.b, GPIO.LOW)
         else:
             print "Motor: I do not know this direction"
 
@@ -54,9 +54,9 @@ class MOT(MP):
         GPIO.setmode(GPIO.BOARD)
 
         self.motor1 = Motor(
-                        config.getint("PINS", "MOTOR1A"),
-                        config.getint("PINS", "MOTOR1B"),
-                        config.getint("PINS", "MOTOR1E")
+                        self.config.getint("PINS", "MOTOR1A"),
+                        self.config.getint("PINS", "MOTOR1B"),
+                        self.config.getint("PINS", "MOTOR1E")
                         )
 
     def run_impl(self):
