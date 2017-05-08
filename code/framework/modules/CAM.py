@@ -3,12 +3,9 @@ from MP import MP
 
 class CAM(MP):
     def init(self):
-        self.objseen = False
+        pass
 
     def run_impl(self):
-        if not self.objseen:
-            print "CAM: inserting ball"
-            self.objseen = True
-            self.md["Objects"] = ["Ball"]
-
+        # a dummy implementation to insert an object
+        # for the brain to react upon
         print "IMPL"

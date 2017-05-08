@@ -60,17 +60,18 @@ class MOT(MP):
                         )
 
     def run_impl(self):
-        if len(self.md["Move"]) == 2:
-            print self.name, " - MOVING!"
-            speed = self.md["Move"][0]
-            angle = self.md["Move"][1]
-            self.md["Move"] = []
-            self.motor1.set_mode("forward")
-            self.motor1.set_speed(speed)
-            time.sleep(2)
-            self.motor1.set_speed(0)
-            self.motor1.set_mode("release")
-            print self.name, " - MOVING DONE!"
+        if "Move" in self.md:
+            if len(self.md["Move"]) == 2:
+                print self.name, " - MOVING!"
+                speed = self.md["Move"][0]
+                angle = self.md["Move"][1]
+                self.md["Move"] = []
+                self.motor1.set_mode("forward")
+                self.motor1.set_speed(speed)
+                time.sleep(2)
+                self.motor1.set_speed(0)
+                self.motor1.set_mode("release")
+                print self.name, " - MOVING DONE!"
 
     def cleanup(self):
         self.motor1.cleanup()

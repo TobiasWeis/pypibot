@@ -16,7 +16,7 @@ import ConfigParser
 
 from multiprocessing import Process, Manager
 
-from modules import BRAIN,CAM,MEM,MOT
+from modules import BRAIN,CAM,US,MEM,MOT
 
 Config = ConfigParser.ConfigParser()
 Config.read("config.ini")
@@ -30,6 +30,10 @@ procs = []
 cam = CAM.CAM("CAM", Config, md)
 procs.append(cam)
 cam.start()
+
+us = US.US("US", Config, md)
+procs.append(us)
+us.start()
 
 mem = MEM.MEM("MEM", Config, md)
 procs.append(mem)
