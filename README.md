@@ -11,6 +11,7 @@ Whenever available, detailed information and supplier-link are provided as pdf i
 * Raspberry-Pi B+ V2
 * Edimax EW-7811UN Wireless USB Adapter
 
+
 * Motors: 4x DC 6.0V, 35:1 gear ratio, diameter of shaft: 4mm
 * Motor-mounts: 4x DROK 25mm universal dc motor mount
 * Motor-driver: 2x L298 dual H-bridge modules
@@ -36,3 +37,11 @@ TODO:
 * Implement logging
 
 ![Classes](./docs/diagrams/classes.png)
+
+## Setup and Installation
+
+Edimax WLAN-Stick has a power-save mode and goes to sleep, to avoid this:
+```
+sudo vim /etc/modprobe.d/8192cu.conf
+options 8192cu rtw_power_mgnt=0 rtw_enusbss=0
+```
