@@ -1,6 +1,7 @@
 from MP import MP
 import RPi.GPIO as GPIO
 from utils import *
+import math
 import time
 
 '''
@@ -27,7 +28,7 @@ class Motor():
         self.p.start(0)
 
     def set_mode(self, d):
-        if d == "back":
+        if d == "backward":
             GPIO.output(self.a, GPIO.HIGH)
             GPIO.output(self.b, GPIO.LOW)
         elif d == "forward":
@@ -51,8 +52,9 @@ class Motor():
 
 class MOT(MP):
     def init(self):
-	self.mcs = utils.Coordinate()
-        self.mcs_t = utils.getMs()
+        self.motion = None
+	self.mcs = Coordinate()
+        self.mcs_t = getMs()
 
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)
@@ -92,6 +94,8 @@ class MOT(MP):
         self.motor3.set_speed(speed)
         self.motor4.set_speed(speed)
 
+        self.motion = "forward"
+
     def bwd(self, speed):
         self.motor1.set_mode("backward")
         self.motor2.set_mode("backward")
@@ -103,18 +107,9 @@ class MOT(MP):
         self.motor3.set_speed(speed)
         self.motor4.set_speed(speed)
 
+        self.motion = "bacward"
+
     def left(self,speed):
-        self.motor1.set_mode("backward")
-        self.motor2.set_mode("backward")
-        self.motor3.set_mode("forward")
-        self.motor4.set_mode("forward")
-
-        self.motor1.set_speed(speed)
-        self.motor2.set_speed(speed)
-        self.motor3.set_speed(speed)
-        self.motor4.set_speed(speed)
-
-    def right(self,speed):
         self.motor1.set_mode("forward")
         self.motor2.set_mode("forward")
         self.motor3.set_mode("backward")
@@ -124,6 +119,21 @@ class MOT(MP):
         self.motor2.set_speed(speed)
         self.motor3.set_speed(speed)
         self.motor4.set_speed(speed)
+        
+        self.motion = "left"
+
+    def right(self,speed):
+        self.motor1.set_mode("backward")
+        self.motor2.set_mode("backward")
+        self.motor3.set_mode("forward")
+        self.motor4.set_mode("forward")
+
+        self.motor1.set_speed(speed)
+        self.motor2.set_speed(speed)
+        self.motor3.set_speed(speed)
+        self.motor4.set_speed(speed)
+        
+        self.motion = "right"
 
     def stop(self):
         self.motor1.set_speed(0)
@@ -136,7 +146,9 @@ class MOT(MP):
         self.motor3.set_mode("block")
         self.motor4.set_mode("block")
 
-    def integrate(self,t):
+        self.motion = None
+
+    def integrate_mcs(self,t):
 	x = self.mcs.x + t.x*math.cos(self.mcs.a) - t.y*math.sin(self.mcs.a)
 	y = self.mcs.y + t.x*math.sin(self.mcs.a) + t.y*math.cos(self.mcs.a)
 	a = self.mcs.a + t.a
@@ -148,13 +160,13 @@ class MOT(MP):
 
         #-- calculate movement of bot
 	t = Coordinate()
-        if self.motion == forward:
+        if self.motion == "forward":
             t.x = diff_s * self.config.getfloat("MOT", "MPERS50")
-        elif self.motion == backward:
+        elif self.motion == "backward":
             t.x = -diff_s * self.config.getfloat("MOT", "MPERS50")
-        elif self.motion == left:
+        elif self.motion == "left":
             t.a = diff_s * self.config.getfloat("MOT", "APERS50")
-	elif self.motion == right:
+	elif self.motion == "right":
             t.a = -diff_s * self.config.getfloat("MOT", "APERS50")
 
 	return t
@@ -170,12 +182,24 @@ class MOT(MP):
                 #-- get the command
                 print self.name, " - MOVING!"
                 speed = self.md["Move"][0]
-                angle = self.md["Move"][1]
+                direction = self.md["Move"][1]
                 #-- take it out of the queue
                 self.md["Move"] = []
                 #-- execute
-                self.fwd(speed)
-                time.sleep(2)
+                if direction == "forward":
+                    print "Motor: FWD"
+                    self.fwd(speed)
+                elif direction == "backward":
+                    print "Motor: BWD"
+                    self.bwd(speed)
+                elif direction == "left":
+                    print "Motor: LEFT"
+                    self.left(speed)
+                elif direction == "right":
+                    print "Motor: RIGHT"
+                    self.right(speed)
+
+                time.sleep(1)
                 self.stop()
                 print self.name, " - MOVING DONE!"
 

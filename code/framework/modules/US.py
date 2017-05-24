@@ -32,6 +32,7 @@ class US(MP):
         return ((et-st) * 34300) / 2
 
     def run_impl(self):
-        d = self.measure()
-        print self.name ," - Distance: ", d
-        self.md["US1"] = d
+        pass
+        #d = self.measure()
+        #print self.name ," - Distance: ", d
+        #self.md["US1"] = d
