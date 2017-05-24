@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="14mm"
+   version="1.2"
+   height="3mm"
+   viewBox="0 0 551.18109 118.11026"
+   id="0"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="dc_motor_encoder_pcb.svg">
+  <metadata
+     id="metadata43468">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs43466" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1371"
+     id="namedview43464"
+     showgrid="false"
+     inkscape:zoom="24.973546"
+     inkscape:cx="32.909074"
+     inkscape:cy="-10.806609"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="0"
+     units="mm" />
+  <desc
+     id="0.0"
+     oldid="0.0">
+    <referenceFile
+       id="0.0.0"
+       oldid="0.0.0">dip_8_300mil_pcb.svg</referenceFile>
+  </desc>
+  <desc
+     id="0.1"
+     oldid="0.1">Fritzing footprint SVG</desc>
+  <g
+     id="silkscreen"
+     transform="matrix(1.3373823,0,0,0.27408716,-5.1206978,2.8098414)">
+    <line
+       id="0.2.0"
+       y1="10"
+       x1="10"
+       y2="410"
+       x2="10"
+       style="stroke:#ffffff;stroke-width:10" />
+    <line
+       id="0.2.1"
+       y1="410"
+       x1="10"
+       y2="410"
+       x2="410"
+       style="stroke:#ffffff;stroke-width:10" />
+    <line
+       id="0.2.2"
+       y1="410"
+       x1="410"
+       y2="10"
+       x2="410"
+       style="stroke:#ffffff;stroke-width:10" />
+    <line
+       id="0.2.3"
+       y1="10"
+       x1="10"
+       y2="10"
+       x2="160"
+       style="stroke:#ffffff;stroke-width:10" />
+    <line
+       id="0.2.4"
+       y1="10"
+       x1="260"
+       y2="10"
+       x2="410"
+       style="stroke:#ffffff;stroke-width:10" />
+  </g>
+  <g
+     id="copper1"
+     transform="translate(0.29224455,-3.0270586)">
+    <g
+       id="copper0">
+      <rect
+         width="55"
+         x="32.5"
+         y="32.5"
+         height="55"
+         id="square"
+         style="fill:none;stroke:#ffbf00;stroke-width:20" />
+      <circle
+         cx="60"
+         cy="60"
+         id="connector1pad"
+         r="27.5"
+         style="fill:none;stroke:#ffbf00;stroke-width:20" />
+      <circle
+         cx="146.11111"
+         cy="60"
+         id="connector2pad"
+         r="27.5"
+         style="fill:none;stroke:#ffbf00;stroke-width:20" />
+      <circle
+         cx="232.22221"
+         cy="60"
+         id="connector3pad"
+         r="27.5"
+         style="fill:none;stroke:#ffbf00;stroke-width:20" />
+      <circle
+         cx="318.33334"
+         cy="60"
+         id="connector6pad"
+         r="27.5"
+         style="fill:none;stroke:#ffbf00;stroke-width:20" />
+      <circle
+         cx="404.44443"
+         cy="60"
+         id="connector4pad"
+         r="27.5"
+         style="fill:none;stroke:#ffbf00;stroke-width:20" />
+      <circle
+         cx="490.55554"
+         cy="60"
+         id="connector5pad"
+         r="27.5"
+         style="fill:none;stroke:#ffbf00;stroke-width:20" />
+    </g>
+  </g>
+</svg>
