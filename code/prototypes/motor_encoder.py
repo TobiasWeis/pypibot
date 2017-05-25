@@ -16,8 +16,8 @@ ENC1B = 16
 #GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 #GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-GPIO.setup(ENC1A, GPIO.IN)
-GPIO.setup(ENC1B, GPIO.IN)
+GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def get_seq(a,b):
     a = not a
