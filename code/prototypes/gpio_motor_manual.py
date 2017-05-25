@@ -2,20 +2,20 @@
 import time
 import RPi.GPIO as GPIO
 
-M1A = 3
-M1B = 5
+M1A = 5
+M1B = 3
 M1E = 7
 
-M2A = 11
-M2B = 13
+M2A = 13
+M2B = 11
 M2E = 15
 
-M3B = 19
-M3A = 21
+M3A = 19
+M3B = 21
 M3E = 23
 
-M4B = 29
-M4A = 31
+M4A = 29
+M4B = 31
 M4E = 33
 
 GPIO.setwarnings(False)
@@ -153,9 +153,9 @@ def right(t, pow=50):
 while True:
     inp = raw_input()
     if inp == 'w':
-        forward(120, 20)
+        forward(0.15, 100)
     elif inp == 's':
-        backward(2)
+        backward(0.15,100)
     elif inp == 'a':
         left(2)
     elif inp == 'd':
