@@ -71,6 +71,11 @@ p4 = GPIO.PWM(M4E, 100)
 p4.start(0)
 
 def neutral():
+    GPIO.output(M1A, GPIO.LOW)
+    GPIO.output(M1B, GPIO.LOW)
+    GPIO.output(M2A, GPIO.LOW)
+    GPIO.output(M2B, GPIO.LOW)
+
     p1.ChangeDutyCycle(0)
     p2.ChangeDutyCycle(0)
     p3.ChangeDutyCycle(0)
@@ -153,9 +158,9 @@ def right(t, pow=50):
 while True:
     inp = raw_input()
     if inp == 'w':
-        forward(0.15, 100)
+        forward(.35,45)
     elif inp == 's':
-        backward(0.15,100)
+        backward(.35,45)
     elif inp == 'a':
         left(2)
     elif inp == 'd':
