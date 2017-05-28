@@ -1,5 +1,6 @@
 from MP import MP
 from utils import *
+import numpy as np
 import math
 import time
 
@@ -64,6 +65,7 @@ try:
         def check_encoder(self):
             seq = self.get_seq()
             delta = (seq - self.old_seq) % 4
+            self.old_seq = seq
 
             if delta == 0:
                 pass # nothing happened
@@ -71,14 +73,16 @@ try:
                 self.direction = 1
                 self.cnt += 1
             elif delta == 2:
-                self.cnt += 2*direction
+                self.cnt += 2*self.direction
             elif delta == 3:
                 self.direction = -1
                 self.cnt -= 1
 
         def get_delta(self):
             self.check_encoder()
-            return self.cnt/float(35*14*3)*0.265 # circumference
+            delta_m = self.cnt/float(35*14*3)*0.265 # circumference
+            self.cnt = 0
+            return delta_m
 
         def set_speed(self,speed):
             self.p.ChangeDutyCycle(speed)
@@ -99,25 +103,33 @@ try:
             self.motor1 = Motor(
                             self.config.getint("PINS", "MOTOR1A"),
                             self.config.getint("PINS", "MOTOR1B"),
-                            self.config.getint("PINS", "MOTOR1E")
+                            self.config.getint("PINS", "MOTOR1E"),
+                            self.config.getint("PINS", "MOTOR1ENCA"),
+                            self.config.getint("PINS", "MOTOR1ENCB")
                             )
 
             self.motor2 = Motor(
                             self.config.getint("PINS", "MOTOR2A"),
                             self.config.getint("PINS", "MOTOR2B"),
-                            self.config.getint("PINS", "MOTOR2E")
+                            self.config.getint("PINS", "MOTOR2E"),
+                            self.config.getint("PINS", "MOTOR2ENCA"),
+                            self.config.getint("PINS", "MOTOR2ENCB")
                             )
 
             self.motor3 = Motor(
                             self.config.getint("PINS", "MOTOR3A"),
                             self.config.getint("PINS", "MOTOR3B"),
-                            self.config.getint("PINS", "MOTOR3E")
+                            self.config.getint("PINS", "MOTOR3E"),
+                            self.config.getint("PINS", "MOTOR3ENCA"),
+                            self.config.getint("PINS", "MOTOR3ENCB")
                             )
 
             self.motor4 = Motor(
                             self.config.getint("PINS", "MOTOR4A"),
                             self.config.getint("PINS", "MOTOR4B"),
-                            self.config.getint("PINS", "MOTOR4E")
+                            self.config.getint("PINS", "MOTOR4E"),
+                            self.config.getint("PINS", "MOTOR4ENCA"),
+                            self.config.getint("PINS", "MOTOR4ENCB")
                             )
 
         def fwd(self,speed):
@@ -200,7 +212,8 @@ try:
 
             #-- calculate movement of bot
             t = Coordinate()
-            t.x = np.mean([d1,d2,d3,d4]) # FIXME: only works if all go fwd/bwd
+            #t.x = np.mean([d1,d2,d3,d4]) # FIXME: only works if all go fwd/bwd
+            t.x = np.max([d1,d2,d3,d4])
             # FIXME: integration missing, only for testing!
 
             return t

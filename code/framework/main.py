@@ -27,6 +27,7 @@ md["shutdown"] = False
 
 procs = []
 
+'''
 cam = CAM.CAM("CAM", Config, md)
 procs.append(cam)
 cam.start()
@@ -42,6 +43,7 @@ mem.start()
 brain = BRAIN.BRAIN("BRAIN", Config, md)
 procs.append(brain)
 brain.start()
+'''
 
 mot = MOT.MOT("MOT", Config, md)
 procs.append(mot)
@@ -51,8 +53,8 @@ mot.start()
 while not md["shutdown"]:
     time.sleep(1)
 
-    if "MCS" in self.md:
-        print "MCS: ", md["MCS"]
+    if "MCS" in md:
+        md["MCS"]._print()
 
     while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         line = sys.stdin.readline()

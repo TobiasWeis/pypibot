@@ -17,10 +17,10 @@ Laut Datenblatt: 14 Pole, 7 Pulse pro U
 14 Pole machen doch aber 28 Flanken pro U ?!
 
 -> Bei voller Drehzahl liegen vorne 177 U/s an, hinten 6200 U/s
-6200 / 177 == 35.028, d.h. eine volle Umdrehung des Rades NACH Getriebe müsste
+6200 / 177 == 35.028, d.h. eine volle Umdrehung des Rades NACH Getriebe musste
 35.028 * 7 = 245 Pulse haben
 
-Zähle per Umdrehung ca. 1500 Umdrehungen, was ca. 35*14*3 (Übersetzung, #Pole, Faktor) entspricht (1470))
+Zahle per Umdrehung ca. 1500 Umdrehungen, was ca. 35*14*3 (Ubersetzung, #Pole, Faktor) entspricht (1470))
 '''
 
 GPIO.setmode(GPIO.BOARD)
@@ -31,8 +31,8 @@ ENC1B = 16
 #GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 #GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 def get_seq(a,b):
     a = not a
@@ -68,6 +68,16 @@ def check_encoder(a,b,old_seq,cnt,direction):
 
     return seq,cnt,direction
 
+# stupid simple flank-measurements of phase A
+old = -1
+cnt = 0
+while True:
+    new = GPIO.input(ENC1A)
+    if new != old and new > old:
+        cnt += 1
+        print cnt
+    old = new 
+sys.exit(1)
 
 seq=0
 cnt=0

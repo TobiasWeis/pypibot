@@ -8,4 +8,5 @@ class CAM(MP):
     def run_impl(self):
         # a dummy implementation to insert an object
         # for the brain to react upon
-        print "IMPL"
+        #print "IMPL"
+        pass
