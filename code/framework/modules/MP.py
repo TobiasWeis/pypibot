@@ -16,7 +16,6 @@ class MP(multiprocessing.Process):
         while not self.md["shutdown"]:
             print self.name
             self.run_impl()
-            time.sleep(1)
 
         self.cleanup()
 

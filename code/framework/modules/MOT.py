@@ -15,16 +15,26 @@ try:
     import RPi.GPIO as GPIO
 
     class Motor():
-        def __init__(self,a,b,e):
+        def __init__(self,a,b,e,enca,encb):
             self.a = a
             self.b = b
             self.e = e
+            self.enca = enca
+            self.encb = encb
 
             GPIO.setup(self.a, GPIO.OUT)
             GPIO.setup(self.b, GPIO.OUT)
             GPIO.setup(self.e, GPIO.OUT)
 
+            GPIO.setup(self.enca, GPIO.IN)
+            GPIO.setup(self.encb, GPIO.IN)
+
             self.set_mode("release")
+
+            # set up variables for encoder comptuations
+            self.old_seq = 0
+            self.direction = 0
+            self.cnt = 0
 
             # setup PWM on enable port
             self.p = GPIO.PWM(self.e, 100)
@@ -45,6 +55,30 @@ try:
                 GPIO.output(self.b, GPIO.LOW)
             else:
                 print "Motor: I do not know this direction"
+
+        def get_seq(self):
+            a = not GPIO.input(self.enca)
+            b = not GPIO.input(self.encb)
+            return (a ^ b) | b << 1
+
+        def check_encoder(self):
+            seq = self.get_seq()
+            delta = (seq - self.old_seq) % 4
+
+            if delta == 0:
+                pass # nothing happened
+            elif delta == 1:
+                self.direction = 1
+                self.cnt += 1
+            elif delta == 2:
+                self.cnt += 2*direction
+            elif delta == 3:
+                self.direction = -1
+                self.cnt -= 1
+
+        def get_delta(self):
+            self.check_encoder()
+            return self.cnt/float(35*14*3)*0.265 # circumference
 
         def set_speed(self,speed):
             self.p.ChangeDutyCycle(speed)
@@ -158,19 +192,16 @@ try:
             return Coordinate(x,y,a)
 
         def calc_t(self):
-            diff = getMs() - self.mcs_t #-- calculate difference to last timestamp
-            diff_s = diff/1000.
+            # get all encoder values
+            d1=self.motor1.get_delta()
+            d2=self.motor2.get_delta()
+            d3=self.motor3.get_delta()
+            d4=self.motor4.get_delta()
 
             #-- calculate movement of bot
             t = Coordinate()
-            if self.motion == "forward":
-                t.x = diff_s * self.config.getfloat("MOT", "MPERS50")
-            elif self.motion == "backward":
-                t.x = -diff_s * self.config.getfloat("MOT", "MPERS50")
-            elif self.motion == "left":
-                t.a = diff_s * self.config.getfloat("MOT", "APERS50")
-            elif self.motion == "right":
-                t.a = -diff_s * self.config.getfloat("MOT", "APERS50")
+            t.x = np.mean([d1,d2,d3,d4]) # FIXME: only works if all go fwd/bwd
+            # FIXME: integration missing, only for testing!
 
             return t
             
@@ -178,8 +209,12 @@ try:
         def run_impl(self):
             # integrate motion to perform dead-reckoning
             self.mcs = self.integrate_mcs(self.calc_t())
+            self.md["MCS"] = self.mcs
             self.mcs_t = getMs() #-- get current time in milliseconds
 
+            # FIXME: this needs to be transformed in order to still
+            # be able to read encoders fast enough
+            '''
             if "Move" in self.md:
                 if len(self.md["Move"]) == 2:
                     #-- get the command
@@ -205,6 +240,7 @@ try:
                     time.sleep(1)
                     self.stop()
                     print self.name, " - MOVING DONE!"
+            '''
 
         def cleanup(self):
             self.motor1.cleanup()

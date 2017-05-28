@@ -51,6 +51,9 @@ mot.start()
 while not md["shutdown"]:
     time.sleep(1)
 
+    if "MCS" in self.md:
+        print "MCS: ", md["MCS"]
+
     while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         line = sys.stdin.readline()
         if line:
