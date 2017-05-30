@@ -59,7 +59,8 @@ def check_encoder(a,b,old_seq,cnt,direction):
         direction = 1
         cnt += 1
     elif delta == 2:
-        cnt += 2*direction
+        #cnt += 2*direction
+        print "X",
         #print "%08d - Two steps" % cnt # clockwise OR counter-clockwise
     elif delta == 3:
         direction = -1
@@ -69,15 +70,18 @@ def check_encoder(a,b,old_seq,cnt,direction):
     return seq,cnt,direction
 
 # stupid simple flank-measurements of phase A
+'''
 old = -1
 cnt = 0
 while True:
     new = GPIO.input(ENC1A)
-    if new != old and new > old:
+    if new == 1 and old == 0:
+        #if new != old and new > old:
         cnt += 1
         print cnt
     old = new 
 sys.exit(1)
+'''
 
 seq=0
 cnt=0
