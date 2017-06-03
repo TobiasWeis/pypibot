@@ -101,7 +101,8 @@ if __name__ == "__main__":
 
         fig = plt.figure(1)
         fig.clf()
-        plt.title("Distance: %.2f" % dist)
+        plt.suptitle("Distance: %.2f" % dist)
+        plt.title("Estimated T: %.2f, %.2f @ %.2f deg" % (tx,ty,math.degrees(ta)))
         tmpcoords = np.array(coords)
         plt.axis("equal")
         plt.xlim((-6000,6000))
@@ -115,7 +116,7 @@ if __name__ == "__main__":
 
         fig = plt.figure(2)
         fig.clf()
-        plt.suptitle("Distance: %.2f" % dist)
+        plt.suptitle("Distance: %.2f, Est-T: %.2f, %.2f @ %.2f deg" % (dist,tx,ty,math.degrees(ta)))
         fig.add_subplot(121)
         plt.title("Original points")
         plt.scatter(of[:,0], of[:,1], c='k', label='old frame', alpha=0.5)
