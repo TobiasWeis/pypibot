@@ -2,6 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def getDist(lsb, msb):
     if (msb == "80" or msb == "70"):
@@ -24,13 +25,11 @@ cnt = 0
 def plot():
     fig = plt.figure()
     ax = fig.gca()
-    ax.set_xticks(np.arange(-10,10,0.2))
-    ax.set_yticks(np.arange(-10,10.,0.2))
+    ax.set_xticks(np.arange(-10,10,0.5))
+    ax.set_yticks(np.arange(-10,10.,0.5))
     ax.set_aspect('equal')
-    plt.xlim((-1.5,1.5))
-    plt.ylim((-1.5,1.5))
-    plt.xlim((-0.6, 0.6))
-    plt.ylim((-0.4, 1.2))
+    plt.xlim((-6.,6.))
+    plt.ylim((-6.,6.))
     plt.scatter(x,y)
     plt.plot(0,0,'ro')
     plt.axvline(0,color='red')
@@ -40,7 +39,7 @@ def plot():
     plt.show()
 
 #with open("outfile_forward_backward.txt") as f:
-with open("outfile.txt") as f:
+with open("outfile_complex.txt") as f:
     line = f.readline()
     while line != "":
         bytes = line.split(':')

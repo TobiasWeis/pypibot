@@ -3,21 +3,21 @@ from scipy.spatial.distance import cdist
 
 def best_fit_transform(A, B):
     '''
-    Calculates the least-squares best-fit transform between corresponding 3D points A->B
+    Calculates the least-squares best-fit transform between corresponding 2D points A->B
     Input:
-      A: Nx3 numpy array of corresponding 3D points
-      B: Nx3 numpy array of corresponding 3D points
+      A: Nx2 numpy array of corresponding 3D points
+      B: Nx2 numpy array of corresponding 3D points
     Returns:
-      T: 4x4 homogeneous transformation matrix
-      R: 3x3 rotation matrix
-      t: 3x1 column vector
+      T: 3x3 homogeneous transformation matrix
+      R: 2x2 rotation matrix
+      t: 2x1 column vector
     '''
 
     assert len(A) == len(B)
 
     # translate points to their centroids
-    centroid_A = np.mean(A, axis=0)
-    centroid_B = np.mean(B, axis=0)
+    centroid_A = np.mean(A.astype(np.float64), axis=0)
+    centroid_B = np.mean(B.astype(np.float64), axis=0)
     AA = A - centroid_A
     BB = B - centroid_B
 
@@ -28,8 +28,9 @@ def best_fit_transform(A, B):
 
     # special reflection case
     if np.linalg.det(R) < 0:
-       Vt[2,:] *= -1
-       R = np.dot(Vt.T, U.T)
+        print "===================================== IT HAPPENED!"
+    #   Vt[2,:] *= -1
+    #   R = np.dot(Vt.T, U.T)
 
     # translation
     t = centroid_B.T - np.dot(R,centroid_A.T)
@@ -51,13 +52,13 @@ def nearest_neighbor(src, dst):
         distances: Euclidean distances of the nearest neighbor
         indices: dst indices of the nearest neighbor
     '''
-
     all_dists = cdist(src, dst, 'euclidean')
     indices = all_dists.argmin(axis=1)
     distances = all_dists[np.arange(all_dists.shape[0]), indices]
+
     return distances, indices
 
-def icp(A, B, init_pose=None, max_iterations=20, tolerance=0.001):
+def icp(A, B, init_pose=None, max_iterations=15, tolerance=0.01):
     '''
     The Iterative Closest Point method
     Input:
@@ -84,6 +85,7 @@ def icp(A, B, init_pose=None, max_iterations=20, tolerance=0.001):
     prev_error = 0
 
     for i in range(max_iterations):
+        print i,",",
         # find the nearest neighbours between the current source and destination points
         distances, indices = nearest_neighbor(src[0:2,:].T, dst[0:2,:].T)
 
@@ -95,11 +97,14 @@ def icp(A, B, init_pose=None, max_iterations=20, tolerance=0.001):
 
         # check error
         mean_error = np.sum(distances) / distances.size
-        if abs(prev_error-mean_error) < tolerance:
+ 
+        if abs(prev_error - mean_error) < tolerance:
             break
+
         prev_error = mean_error
 
     # calculate final transformation
+    # so we discard all transformations before?!
     T,_,_ = best_fit_transform(A, src[0:2,:].T)
 
     return T, distances

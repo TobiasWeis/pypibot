@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 class LaserPoint():
     def __init__(self,x,y,quality,bad,bad2):
@@ -70,20 +71,32 @@ class Picolo():
         arr = np.array(arr)
         '''
         arr = self.points[cnt]
-        plt.scatter(arr[:,0], arr[:,1], c=arr[:,2], alpha=0.8,  vmax=max(arr[:,2]), cmap="inferno")
+        plt.scatter(arr[:,0], arr[:,1], c=arr[:,2], alpha=0.8,  vmin=0, vmax=2048, cmap="inferno")
         plt.colorbar()
+
+        ax = fig.gca()
+        ax.set_xticks(np.arange(-6000, 6000, 500))
+        ax.set_yticks(np.arange(-6000, 6000, 500))
+
         
         plt.plot(0,0,'go')
         plt.axvline(0,color='g')
         plt.axhline(0,color='g')
 
+
+        plt.axis('equal')
+
+
         bad_ones = arr[(arr[:,3] == True) | (arr[:,4] == True)]
         plt.scatter(bad_ones[:,0], bad_ones[:,1], c='r')
 
-        plt.axis('equal')
-        plt.show()
+        ax.set_xlim((-6000, 6000))
+        ax.set_ylim((-6000, 6000))
+
+        plt.savefig("/tmp/laser_%08d.png" % cnt)
+        #plt.show()
 
 if __name__ == "__main__":
     p = Picolo()
-    p.readFile("outfile_forward_backward.txt")
+    p.readFile("outfile_complex.txt")
     p.show()
