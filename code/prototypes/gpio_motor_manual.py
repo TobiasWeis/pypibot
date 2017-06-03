@@ -118,7 +118,7 @@ def backward(t, pow=50):
     time.sleep(t)
     neutral()
 
-def left(t, pow=50):
+def left(t, pow=80):
     GPIO.output(M1A, GPIO.LOW)
     GPIO.output(M1B, GPIO.HIGH)
     GPIO.output(M2A, GPIO.LOW)
@@ -136,7 +136,7 @@ def left(t, pow=50):
     time.sleep(t)
     neutral()
 
-def right(t, pow=50):
+def right(t, pow=80):
     GPIO.output(M1B, GPIO.LOW)
     GPIO.output(M1A, GPIO.HIGH)
     GPIO.output(M2B, GPIO.LOW)
@@ -154,17 +154,16 @@ def right(t, pow=50):
     time.sleep(t)
     neutral()
 
-
 while True:
     inp = raw_input()
     if inp == 'w':
-        forward(.35,45)
+        forward(2,35)
     elif inp == 's':
-        backward(.35,45)
+        backward(2,35)
     elif inp == 'a':
-        left(2)
+        left(1,65)
     elif inp == 'd':
-        right(2)
+        right(1,65)
     print "INput: ", inp
 
 sys.exit()
