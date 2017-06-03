@@ -157,7 +157,7 @@ def right(t, pow=80):
 while True:
     inp = raw_input()
     if inp == 'w':
-        forward(2,35)
+        forward(2,15)
     elif inp == 's':
         backward(2,35)
     elif inp == 'a':

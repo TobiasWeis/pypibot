@@ -25,8 +25,8 @@ Zahle per Umdrehung ca. 1500 Umdrehungen, was ca. 35*14*3 (Ubersetzung, #Pole, F
 
 GPIO.setmode(GPIO.BOARD)
 
-ENC1A = 12
-ENC1B = 16
+ENC1A = 16
+ENC1B = 12
 
 #GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 #GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -34,9 +34,13 @@ ENC1B = 16
 GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+outfile = open("ticks.txt", "w+")
+
 def get_seq(a,b):
     a = not a
     b = not b
+
+    outfile.write("%d,%d,%d\n" % (a,b,int(round(time.time()*1000))))
     '''
     Decoder logic
     Seq B   A   A ^ B
@@ -55,6 +59,7 @@ def check_encoder(a,b,old_seq,cnt,direction):
     if delta == 0:
         pass # nothing happened
     elif delta == 1:
+        print "+",
         #print "%08d - Forward" % cnt # one step
         direction = 1
         cnt += 1
@@ -63,6 +68,7 @@ def check_encoder(a,b,old_seq,cnt,direction):
         print "X",
         #print "%08d - Two steps" % cnt # clockwise OR counter-clockwise
     elif delta == 3:
+        print "-",
         direction = -1
         #print "%08d - Backward" % cnt
         cnt -= 1
@@ -98,5 +104,5 @@ while True:
         print "%08d\t%d\t%.2f rot, %.3f m" % (cnt,direction, u, m)
         ss = time.time()
 
-
-
+print "Closing"
+outfile.close()
