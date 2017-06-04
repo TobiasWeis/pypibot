@@ -51,6 +51,9 @@ class Enc():
         self.cnt=0
         self.dir=0
 
+        self.ticks_per_round = float(35*14*3)
+        self.circumference = 0.265
+
     def get_seq(self):
         a = not GPIO.input(self.a)
         b = not GPIO.input(self.b)
@@ -91,10 +94,14 @@ class Enc():
 
         return self.seq,self.cnt,self.dir
 
-    def print_track(self):
-        u = self.cnt/float(35*14*3)
-        m = u*0.265
+    def get_travel(self):
+        u = self.cnt/self.ticks_per_round 
+        m = u*self.circumference
+        return m
 
+    def print_track(self):
+        u = self.cnt/self.ticks_per_round 
+        m = u*self.circumference
         print "%s: %08d\t%d\t%.2f rot, %.3f m" % (self.name, self.cnt,self.dir, u, m)
 
 
@@ -106,8 +113,11 @@ encoders = [
         ]
 
 
+# FIXME: odometry for skid-steered robots: https://www.coursera.org/learn/robotics-learning/lecture/YdleV/odometry-modeling
 
 ss = time.time()
+
+width_between_wheels = 0.25 #20.5cm
 
 while True:
     for e in encoders:
@@ -115,8 +125,17 @@ while True:
 
     if time.time() - ss > 2:
         print "---------------------------------------"
-        for e in encoders:
-            e.print_track()
+
+        #for e in encoders:
+        #    e.print_track()
+        
+        # lets average left ticks for e_inner/e_outer
+        e_inner = (encoders[0].get_travel + encoders[1].get_travel)/2.
+        e_outer = (encoders[2].get_travel + encoders[3].get_travel)/2.
+        theta = (e_inner + e_outer) / width_between_wheels
+        y = ((e_inner + e_outer) / 2) * math.cos(theta)
+        x = ((e_inner + e_outer) / 2) * math.sin(theta)
+        print "X: %.2f, Y: %.2f, Theta: %.2f", (x,y,math.degrees(theta))
 
         ss = time.time()
 

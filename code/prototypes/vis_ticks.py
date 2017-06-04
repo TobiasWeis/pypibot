@@ -8,13 +8,13 @@ with open("ticks.txt", "r") as f:
 
 ticks = []
 for line in content:
-    ticks.append(line.split(",")[:-1])
-ticks = np.array(ticks)
+    ticks.append(line.split(",")[:])
+ticks = np.array(ticks).astype(np.float64)
 
-fig = plt.figure()
-plt.plot(ticks[:,2], ticks[:,0], 'k-', label='A')
+plt.plot(ticks[:,2], ticks[:,0]+1.2, 'k-', label='A')
 plt.plot(ticks[:,2], ticks[:,1], 'b-', label='B')
 plt.legend()
+
 plt.show()
 
 
