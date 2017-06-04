@@ -2,6 +2,7 @@
 from threading import Thread
 import RPi.GPIO as GPIO
 import time
+import math
 
 '''
 test the wheel encoders
@@ -35,8 +36,6 @@ ENC3B = 22
 ENC4A = 12
 ENC4B = 16
 
-outfile = open("ticks.txt", "w+")
-
 class Enc():
     def __init__(self, pina,pinb,name):
         self.a = pina
@@ -52,7 +51,8 @@ class Enc():
         self.dir=0
 
         self.ticks_per_round = float(35*14*3)
-        self.circumference = 0.265
+        #self.circumference = 0.265 # gum tires
+        self.circumference = 0.2043 # drift tires
 
     def get_seq(self):
         a = not GPIO.input(self.a)
@@ -113,7 +113,12 @@ encoders = [
         ]
 
 
-# FIXME: odometry for skid-steered robots: https://www.coursera.org/learn/robotics-learning/lecture/YdleV/odometry-modeling
+''' 
+Odometry for skid-steered robots: 
+https://www.coursera.org/learn/robotics-learning/lecture/YdleV/odometry-modeling
+
+They suggest to SOLELY using a gyro to measure angular change, instead of calculating it from the encoders.
+'''
 
 ss = time.time()
 
@@ -130,14 +135,23 @@ while True:
         #    e.print_track()
         
         # lets average left ticks for e_inner/e_outer
-        e_inner = (encoders[0].get_travel + encoders[1].get_travel)/2.
-        e_outer = (encoders[2].get_travel + encoders[3].get_travel)/2.
-        theta = (e_inner + e_outer) / width_between_wheels
+        e_1_0 = encoders[0].get_travel()
+        e_1_1 = encoders[1].get_travel()
+        e_2_0 = encoders[2].get_travel()
+        e_2_1 = encoders[3].get_travel()
+
+        e_1 = (e_1_0 + e_1_1)/2.
+        e_2 = (e_2_0 + e_2_1)/2.
+
+        # the larger one is the outer
+        e_inner = min(e_1,e_2)
+        e_outer = max(e_1,e_2)
+
+        theta = (e_outer - e_inner) / width_between_wheels
         y = ((e_inner + e_outer) / 2) * math.cos(theta)
         x = ((e_inner + e_outer) / 2) * math.sin(theta)
-        print "X: %.2f, Y: %.2f, Theta: %.2f", (x,y,math.degrees(theta))
+        print "X: %.2f, Y: %.2f, Theta: %.2f" % (x,y,math.degrees(theta))
+        print e_1_0,",",e_1_1," - ", e_2_0,",",e_2_1
 
         ss = time.time()
 
-print "Closing"
-outfile.close()
