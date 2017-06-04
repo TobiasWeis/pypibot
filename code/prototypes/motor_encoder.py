@@ -23,85 +23,101 @@ Laut Datenblatt: 14 Pole, 7 Pulse pro U
 Zahle per Umdrehung ca. 1500 Umdrehungen, was ca. 35*14*3 (Ubersetzung, #Pole, Faktor) entspricht (1470))
 '''
 
-GPIO.setmode(GPIO.BOARD)
+ENC1A = 32
+ENC1B = 36
 
-ENC1A = 16
-ENC1B = 12
+ENC2A = 38
+ENC2B = 40
 
-#GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-#GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+ENC3A = 18
+ENC3B = 22
 
-GPIO.setup(ENC1A, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(ENC1B, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+ENC4A = 12
+ENC4B = 16
 
 outfile = open("ticks.txt", "w+")
 
-def get_seq(a,b):
-    a = not a
-    b = not b
+class Enc():
+    def __init__(self, pina,pinb,name):
+        self.a = pina
+        self.b = pinb
+        self.name = name
 
-    outfile.write("%d,%d,%d\n" % (a,b,int(round(time.time()*1000))))
-    '''
-    Decoder logic
-    Seq B   A   A ^ B
-    0   0   0   0
-    1   0   1   1
-    2   1   1   0
-    3   1   0   1
-    '''
-    return (a ^ b) | b << 1
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(self.a, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.b, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-def check_encoder(a,b,old_seq,cnt,direction):
-    seq = get_seq(not GPIO.input(a), not GPIO.input(b))
+        self.seq=0
+        self.cnt=0
+        self.dir=0
 
-    delta = (seq-old_seq) % 4
+    def get_seq(self):
+        a = not GPIO.input(self.a)
+        b = not GPIO.input(self.b)
 
-    if delta == 0:
-        pass # nothing happened
-    elif delta == 1:
-        print "+",
-        #print "%08d - Forward" % cnt # one step
-        direction = 1
-        cnt += 1
-    elif delta == 2:
-        #cnt += 2*direction
-        print "X",
-        #print "%08d - Two steps" % cnt # clockwise OR counter-clockwise
-    elif delta == 3:
-        print "-",
-        direction = -1
-        #print "%08d - Backward" % cnt
-        cnt -= 1
+        '''
+        Decoder logic
+        Seq B   A   A ^ B
+        0   0   0   0
+        1   0   1   1
+        2   1   1   0
+        3   1   0   1
+        '''
+        return (a ^ b) | b << 1
 
-    return seq,cnt,direction
+    def check_encoder(self):
+        seq = self.get_seq()
 
-# stupid simple flank-measurements of phase A
-'''
-old = -1
-cnt = 0
-while True:
-    new = GPIO.input(ENC1A)
-    if new == 1 and old == 0:
-        #if new != old and new > old:
-        cnt += 1
-        print cnt
-    old = new 
-sys.exit(1)
-'''
+        delta = (seq-self.seq) % 4
 
-seq=0
-cnt=0
-direction=0
+        if delta == 0:
+            pass # nothing happened
+        elif delta == 1:
+            #print "+",
+            #print "%08d - Forward" % cnt # one step
+            self.dir = 1
+            self.cnt += 1
+        elif delta == 2:
+            #cnt += 2*direction
+            print "X",
+            #print "%08d - Two steps" % cnt # clockwise OR counter-clockwise
+        elif delta == 3:
+            #print "-",
+            self.dir = -1
+            #print "%08d - Backward" % cnt
+            self.cnt -= 1
+
+        self.seq = seq
+
+        return self.seq,self.cnt,self.dir
+
+    def print_track(self):
+        u = self.cnt/float(35*14*3)
+        m = u*0.265
+
+        print "%s: %08d\t%d\t%.2f rot, %.3f m" % (self.name, self.cnt,self.dir, u, m)
+
+
+encoders = [
+        Enc(ENC1A, ENC1B, "M1"),
+        Enc(ENC2A, ENC2B, "M2"),
+        Enc(ENC3A, ENC3B, "M3"),
+        Enc(ENC4A, ENC4B, "M4"),
+        ]
+
+
 
 ss = time.time()
 
 while True:
-    seq,cnt,direction = check_encoder(ENC1A, ENC1B,seq,cnt,direction)
+    for e in encoders:
+        e.check_encoder()
 
     if time.time() - ss > 2:
-        u = cnt/float(35*14*3)
-        m = u*0.265
-        print "%08d\t%d\t%.2f rot, %.3f m" % (cnt,direction, u, m)
+        print "---------------------------------------"
+        for e in encoders:
+            e.print_track()
+
         ss = time.time()
 
 print "Closing"
