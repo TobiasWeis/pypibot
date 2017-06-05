@@ -157,13 +157,13 @@ def right(t, pow=80):
 while True:
     inp = raw_input()
     if inp == 'w':
-        forward(10,15)
+        forward(2,35)
     elif inp == 's':
         backward(2,35)
     elif inp == 'a':
-        left(1,65)
+        left(0.7,35)
     elif inp == 'd':
-        right(1,65)
+        right(0.7,35)
     print "INput: ", inp
 
 sys.exit()

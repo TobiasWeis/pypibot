@@ -36,6 +36,8 @@ ENC3B = 22
 ENC4A = 12
 ENC4B = 16
 
+outfile = open("odo_out.txt", "w+")
+
 class Enc():
     def __init__(self, pina,pinb,name):
         self.a = pina
@@ -67,6 +69,9 @@ class Enc():
         3   1   0   1
         '''
         return (a ^ b) | b << 1
+
+    def reset(self):
+        self.cnt = 0
 
     def check_encoder(self):
         seq = self.get_seq()
@@ -120,25 +125,37 @@ https://www.coursera.org/learn/robotics-learning/lecture/YdleV/odometry-modeling
 They suggest to SOLELY using a gyro to measure angular change, instead of calculating it from the encoders.
 '''
 
-ss = time.time()
+class OdoPosition():
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.a = 0
 
+    def integrate(self,tx,ty,ta):
+        self.x = self.x + tx*math.cos(self.a) - ty*math.sin(self.a)
+        self.y = self.y + tx*math.sin(self.a) + ty*math.cos(self.a)
+        self.a = self.a + ta
+
+
+ss = time.time()
+ss2 = time.time()
 width_between_wheels = 0.25 #20.5cm
+op = OdoPosition()
 
 while True:
     for e in encoders:
         e.check_encoder()
 
-    if time.time() - ss > 2:
-        print "---------------------------------------"
-
-        #for e in encoders:
-        #    e.print_track()
-        
+    if time.time() - ss > 0.1: # integrate 10 times a second
         # lets average left ticks for e_inner/e_outer
         e_1_0 = encoders[0].get_travel()
+        encoders[0].reset()
         e_1_1 = encoders[1].get_travel()
+        encoders[1].reset()
         e_2_0 = encoders[2].get_travel()
+        encoders[2].reset()
         e_2_1 = encoders[3].get_travel()
+        encoders[3].reset()
 
         e_1 = (e_1_0 + e_1_1)/2.
         e_2 = (e_2_0 + e_2_1)/2.
@@ -148,10 +165,16 @@ while True:
         e_outer = max(e_1,e_2)
 
         theta = (e_outer - e_inner) / width_between_wheels
-        y = ((e_inner + e_outer) / 2) * math.cos(theta)
-        x = ((e_inner + e_outer) / 2) * math.sin(theta)
-        print "X: %.2f, Y: %.2f, Theta: %.2f" % (x,y,math.degrees(theta))
-        print e_1_0,",",e_1_1," - ", e_2_0,",",e_2_1
-
+        x = ((e_inner + e_outer) / 2) * math.cos(theta)
+        y = ((e_inner + e_outer) / 2) * math.sin(theta)
+        #print "X: %.2f, Y: %.2f, Theta: %.2f" % (x,y,math.degrees(theta))
+        #print e_1_0,",",e_1_1," - ", e_2_0,",",e_2_1
+        op.integrate(x,y,theta)
+        outfile.write("%.2f, %.2f, %.2f\n" % (op.x, op.y, op.a))
         ss = time.time()
 
+    if time.time() - ss2 > 2:
+        print "Position: ", op.x,",",op.y,",",op.a
+        ss2 = time.time()
+
+outfile.close()
