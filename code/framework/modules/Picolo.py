@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+#import matplotlib.pyplot as plt
+#import seaborn as sns
 
 class LaserPoint():
     def __init__(self,x,y,quality,bad,bad2):
@@ -14,12 +14,10 @@ class LaserPoint():
 class Picolo():
     def __init__(self):
         self.round = 0
-        self.points = {}
-        self.points[0] = np.zeros((360,5), np.float64) * np.nan
+        self.points = np.zeros((360,6), np.float64) * np.nan
 
 
     def decodeLine(self,line):
-        tmppoints = np.zeros((360,5), np.float32)
         try:
             bytes = [int(x,16) for x in line.split(':')[:-1]]
         except Exception, e:
@@ -27,14 +25,11 @@ class Picolo():
             return
 
         if len(bytes) != 22:
-            return False
+            return
+            #raise Exception("Byte-Length does not match")
 
         theta_base = (bytes[1] - 160) * 4
         # on theta == 0 degrees start a new round
-        if theta_base == 0:
-            self.round += 1
-            #self.points[self.round] = []
-            self.points[self.round] = np.zeros((360,5), np.float64) * np.nan
 
         speed = float(bytes[2] | (bytes[3] << 8)) / 64.0
 
@@ -47,11 +42,19 @@ class Picolo():
             bad = bytes[(i*4)+5] & 0x80
             bad2 = bytes[(i*4)+5] & 0x40
 
-            tmppoints[theta] = np.array([theta,dist_mm,x,y,quality])
-
             if dist_mm > 60:
-                self.points[self.round][theta] = [x,y,quality,bad,bad2]
-            #self.points[self.round].append(LaserPoint(x,y,quality,bad,bad2))
+                self.points[theta] = [x,y,quality,bad,bad2,dist_mm]
+            else:
+                self.points[theta] = np.nan
+
+        '''
+        if theta_base == 0:
+            self.frame = self.points.copy()
+            self.points = np.zeros((360,6), np.float64) * np.nan
+            self.round += 1
+
+        '''
+
 
     def readFile(self,fname):
         with open(fname) as f:
@@ -64,16 +67,10 @@ class Picolo():
         for i in range(self.round):
             self.plot(i)
 
+    '''
     def plot(self,cnt):
         fig = plt.figure()
         plt.title("Round: %d" % cnt)
-        '''
-        arr = []
-        for lp in self.points[cnt]:
-            arr.append([lp.x, lp.y, lp.quality, lp.bad, lp.bad2])
-
-        arr = np.array(arr)
-        '''
         arr = self.points[cnt]
         plt.scatter(arr[:,0], arr[:,1], c=arr[:,2], alpha=0.8,  vmin=0, vmax=2048, cmap="inferno")
         plt.colorbar()
@@ -99,6 +96,7 @@ class Picolo():
 
         plt.savefig("/tmp/laser_%08d.png" % cnt)
         #plt.show()
+    '''
 
 if __name__ == "__main__":
     p = Picolo()

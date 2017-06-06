@@ -221,13 +221,12 @@ try:
 
         def run_impl(self):
             # integrate motion to perform dead-reckoning
-            self.mcs = self.integrate_mcs(self.calc_t())
-            self.md["MCS"] = self.mcs
-            self.mcs_t = getMs() #-- get current time in milliseconds
+            #self.mcs = self.integrate_mcs(self.calc_t())
+            #self.md["MCS"] = self.mcs
+            #self.mcs_t = getMs() #-- get current time in milliseconds
 
             # FIXME: this needs to be transformed in order to still
             # be able to read encoders fast enough
-            '''
             if "Move" in self.md:
                 if len(self.md["Move"]) == 2:
                     #-- get the command
@@ -249,11 +248,13 @@ try:
                     elif direction == "right":
                         print "Motor: RIGHT"
                         self.right(speed)
+                    elif direction == "stop":
+                        print "Motor: STOP"
+                        self.stop()
 
                     time.sleep(1)
                     self.stop()
                     print self.name, " - MOVING DONE!"
-            '''
 
         def cleanup(self):
             self.motor1.cleanup()
@@ -268,7 +269,6 @@ except:
             self.motion = None
             self.mcs = Coordinate()
             self.mcs_t = getMs()
-
 
         def fwd(self,speed):
             self.motion = "forward"

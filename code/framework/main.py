@@ -16,7 +16,7 @@ import ConfigParser
 
 from multiprocessing import Process, Manager
 
-from modules import BRAIN,CAM,US,MEM,MOT
+from modules import BRAIN,CAM,US,MEM,MOT,LIDAR
 
 Config = ConfigParser.ConfigParser()
 Config.read("config.ini")
@@ -26,6 +26,10 @@ md = Manager.dict()
 md["shutdown"] = False
 
 procs = []
+
+lidar = LIDAR.LIDAR("LIDAR", Config, md)
+procs.append(lidar)
+lidar.start()
 
 '''
 cam = CAM.CAM("CAM", Config, md)
@@ -39,11 +43,11 @@ us.start()
 mem = MEM.MEM("MEM", Config, md)
 procs.append(mem)
 mem.start()
+'''
 
 brain = BRAIN.BRAIN("BRAIN", Config, md)
 procs.append(brain)
 brain.start()
-'''
 
 mot = MOT.MOT("MOT", Config, md)
 procs.append(mot)
