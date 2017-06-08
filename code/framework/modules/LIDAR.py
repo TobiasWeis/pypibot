@@ -63,7 +63,8 @@ class LIDAR(MP):
         started = False
         string = []
         byte = self.f.read(1)
-        while not self.md["shutdown"]:
+        #while not self.md["shutdown"]:
+        while True:
             if byte != '':
                 enc = (byte.encode('hex') + ":")
                 if enc == "fa:":
@@ -73,6 +74,8 @@ class LIDAR(MP):
                         except Exception, e:
                             print e
                             pass
+                    if self.md["shutdown"]:
+                        break
                     started = True
                     string = "fa:"
                 elif started:
