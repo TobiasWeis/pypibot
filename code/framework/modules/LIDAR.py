@@ -32,31 +32,36 @@ class LIDAR(MP):
 
         start = data[0]
         idx = data[1] - 0xa0
-        #speed = float(data[2] | (data[3] << 8)) / 64.0
+        speed = float(data[2] | (data[3] << 8)) / 64.0
         #print speed
         #in_checksum = data[-2] + (data[-1] << 8)
 
         # first data package (4 bytes after header)
         angle = idx*4 + 0
-        #angle_rad = angle * math.pi / 180.
-        #dist_mm = data[4] | ((data[5] & 0x1f) << 8)
-        #quality = data[6] | (data[7] << 8)
+        '''
+        angle_rad = angle * math.pi / 180.
+        dist_mm = data[4] | ((data[5] & 0x1f) << 8)
+        quality = data[6] | (data[7] << 8)
 
-        #if data[5] & 0x80:
-            #print "X - ",
-        #    pass
-        #else:
-            #print "O - ",
-        #    pass
-        #if data[5] & 0x40:
-            #print "NOT GOOD"
-        #    pass
+        self.points[angle] = dist_mm
+        '''
 
-        #self.points[angle] = dist_mm
+        for i in range(4):
+            theta = angle + i
+            dist_mm = data[(i*4)+4] | ((data[(i*4)+5] & 0x1f) << 8)
+            quality = data[(i*4)+6] | (data[(i*4)+7] << 8)
+            x = dist_mm * np.cos((theta+90) * np.pi/180)
+            y = dist_mm * np.sin((theta+90) * np.pi/180)
+            bad = data[(i*4)+5] & 0x80
+            bad2 = data[(i*4)+5] & 0x40
+
+            if not bad and not bad2:
+                self.points[theta] = dist_mm
 
         if angle == 0 or angle==1 or angle==2 or angle==3:
             print time.time() - self.ss
             self.ss = time.time()
+            self.md["lidar"] = self.points
 
 
     def run_impl(self): # overwrite baseclass, we do not need a loop here

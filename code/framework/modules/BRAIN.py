@@ -10,11 +10,9 @@ class BRAIN(MP):
         self.issued_bwd = False
 
     def run_impl(self):
-        '''
-        if "Lidar" in self.md:
-            #print self.md["Lidar"]
-            for i in range(10):
-                m = self.md["Lidar"][i]
+        if "lidar" in self.md:
+            for i in range(10,-10,-1):
+                m = self.md["lidar"][i]
 
                 if np.isnan(m):
                     print ".",
@@ -27,7 +25,6 @@ class BRAIN(MP):
             print
             time.sleep(0.5)
 
-        '''
 
         # FIXME: just to test the motor module
         '''
