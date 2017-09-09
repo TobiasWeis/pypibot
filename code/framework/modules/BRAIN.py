@@ -11,20 +11,20 @@ class BRAIN(MP):
 
     def run_impl(self):
         if "lidar" in self.md:
+            free = True
+
             for i in range(10,-10,-1):
                 m = self.md["lidar"][i]
+                if not np.isnan(m):
+                    if m < 300:
+                        free = False
+                if not free:
+                    break
 
-                if np.isnan(m):
-                    print ".",
-                elif m > 100 and m < 300:
-                    print "X",
-                elif m >= 300:
-                    print "O",
-                elif m < 100:
-                    print ":",
-            print
-            time.sleep(0.5)
-
+            if not free:
+                self.md["Move"] = [35, "left"]
+            else:
+                self.md["Move"] = [35, "forward"]
 
         # FIXME: just to test the motor module
         '''
