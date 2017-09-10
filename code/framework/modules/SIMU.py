@@ -5,6 +5,7 @@ import time
 import cv2
 import numpy as np
 import math
+from utils import *
 
 class SIMU(MP):
     def init(self):
@@ -17,10 +18,11 @@ class SIMU(MP):
                 [[5,2],[5,3]]
                 ])
 
-        self.lidar = {}
+        self.lidar = []
         self.lidar_rays = []
 
-        self.robot = [5,5,math.radians(90)]
+        self.start_robot = Coordinate(5,5,math.radians(0))
+        self.robot = Coordinate(5,5,math.radians(0))
 
     def show(self, size=10, res=1000):
 
@@ -45,8 +47,9 @@ class SIMU(MP):
                     )
 
         # draw intersects
-        for k,v in self.lidar.iteritems():
-            l = v[1]
+        # FIXME: is now a list again
+        for v in self.lidar:
+            l = [v[1],v[2]]
             try:
                 cv2.circle(img,
                         (int(l[0]/float(size)*res), int(l[1]/float(size)*res)),
@@ -59,15 +62,15 @@ class SIMU(MP):
 
         #draw bot
         cv2.circle(img, 
-                (int(self.robot[0]/float(size)*res),int(self.robot[1]/float(size)*res)),
+                (int(self.robot.x/float(size)*res),int(self.robot.y/float(size)*res)),
                 5,
                 (255,0,255))
 
-        ofx = 0.5 * math.cos(self.robot[2])
-        ofy = -0.5 * math.sin(self.robot[2])
+        ofx = 0.5 * math.cos(self.robot.a)
+        ofy = -0.5 * math.sin(self.robot.a)
         cv2.line(img,
-                (int(self.robot[0]/float(size)*res),int(self.robot[1]/float(size)*res)),
-                (int((self.robot[0]+ofx)/float(size)*res),int((self.robot[1]+ofy)/float(size)*res)),
+                (int(self.robot.x/float(size)*res),int(self.robot.y/float(size)*res)),
+                (int((self.robot.x+ofx)/float(size)*res),int((self.robot.y+ofy)/float(size)*res)),
                 (255,0,255),
                 2
                 )
@@ -92,9 +95,9 @@ class SIMU(MP):
 	return (num / denom.astype(float))*db + b1
 
     def get_line(self, angle):
-	lx = 6.*math.cos(angle)
-	ly = -6.*math.sin(angle)
-	return np.array([[self.robot[0], self.robot[1]],[self.robot[0]+lx, self.robot[1]+ly]])
+	lx = 6.*math.cos(self.robot.a + angle)
+	ly = -6.*math.sin(self.robot.a + angle)
+	return np.array([[self.robot.x, self.robot.y],[self.robot.x+lx, self.robot.y+ly]])
 
     def eucl_dist(self,pa,pb):
         a=pa[0]-pb[0]
@@ -112,25 +115,30 @@ class SIMU(MP):
         '''
             simulate the lidar-beams w.r.t the robot position and the map
         '''
-        self.lidar = {}
+        self.lidar = (np.zeros((angles,3), np.float64) + [100.,0,0]) * [1., np.nan, np.nan]
         self.lidar_rays = []
 
         for alpha in range(angles):
-            self.lidar[alpha] = [100, [-1,-1]]
             ll = self.get_line(math.radians(alpha))
             self.lidar_rays.append(ll)
             for lm in self.mymap:
-                # check if segments intersect at all
+                # check if segments intersect at all, then calculate intersection
 		if self.seg_intersect_check(ll[0],ll[1],lm[0],lm[1]):
 		    intersect = self.seg_intersect(ll[0],ll[1],lm[0],lm[1])
 		    #print intersect
-                    d = self.eucl_dist([self.robot[0],self.robot[1]],intersect)
+                    d = self.eucl_dist([self.robot.x,self.robot.y],intersect)
 		    if (d < 6) and (d < self.lidar[alpha][0]):
-                        self.lidar[alpha] = [d,intersect]
+                        self.lidar[alpha] = [d,intersect[0],intersect[1]]
+        self.md["lidar"] = self.lidar[:,0] * 100
 
     def run_impl(self):
-        pass
-
+        if "MCS" in self.md:
+            self.robot.x = self.start_robot.x + self.md["MCS"].x
+            self.robot.y = self.start_robot.y + self.md["MCS"].y
+            self.robot.a = self.start_robot.a + self.md["MCS"].a
+        self.calc_lidar()
+        self.show()
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     md = {}
@@ -139,8 +147,11 @@ if __name__ == "__main__":
     sim = SIMU("SIMU",None,md)
     sim.init()
 
+    ss = time.time()
     for x in np.arange(0,10,0.1):
         sim.robot[0] = x
         sim.robot[2] = 0
         sim.calc_lidar()
-        sim.show()
+        print time.time() -ss
+        ss = time.time()
+        #sim.show()

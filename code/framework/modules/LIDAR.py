@@ -63,7 +63,6 @@ class LIDAR(MP):
             self.ss = time.time()
             self.md["lidar"] = self.points
 
-
     def run_impl(self): # overwrite baseclass, we do not need a loop here
         started = False
         string = []

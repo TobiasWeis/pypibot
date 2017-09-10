@@ -286,8 +286,13 @@ except:
            self.motion = None
 
         def integrate_mcs(self,t):
+            '''
             x = self.mcs.x + t.x*math.cos(self.mcs.a) - t.y*math.sin(self.mcs.a)
             y = self.mcs.y + t.x*math.sin(self.mcs.a) + t.y*math.cos(self.mcs.a)
+            '''
+            x = self.mcs.x + t.x*math.cos(self.mcs.a) 
+            y = self.mcs.y - t.x*math.sin(self.mcs.a)
+
             a = self.mcs.a + t.a
             return Coordinate(x,y,a)
 
@@ -298,13 +303,13 @@ except:
             #-- calculate movement of bot
             t = Coordinate()
             if self.motion == "forward":
-                t.x = diff_s * self.config.getfloat("MOT", "MPERS50")
+                t.x = diff_s * self.config.getfloat("MOT", "MPERS50") 
             elif self.motion == "backward":
-                t.x = -diff_s * self.config.getfloat("MOT", "MPERS50")
+                t.x = -diff_s * self.config.getfloat("MOT", "MPERS50") 
             elif self.motion == "left":
-                t.a = diff_s * self.config.getfloat("MOT", "APERS50")
+                t.a = diff_s * math.radians(self.config.getfloat("MOT", "APERS50"))
             elif self.motion == "right":
-                t.a = -diff_s * self.config.getfloat("MOT", "APERS50")
+                t.a = -diff_s * math.radians(self.config.getfloat("MOT", "APERS50"))
 
             return t
             
@@ -313,6 +318,8 @@ except:
             # integrate motion to perform dead-reckoning
             self.mcs = self.integrate_mcs(self.calc_t())
             self.mcs_t = getMs() #-- get current time in milliseconds
+
+            self.md["MCS"] = self.mcs 
 
             if "Move" in self.md:
                 if len(self.md["Move"]) == 2:
@@ -324,21 +331,17 @@ except:
                     self.md["Move"] = []
                     #-- execute
                     if direction == "forward":
-                        print "Motor: FWD"
+                        #print "Motor: FWD"
                         self.fwd(speed)
                     elif direction == "backward":
-                        print "Motor: BWD"
+                        #print "Motor: BWD"
                         self.bwd(speed)
                     elif direction == "left":
-                        print "Motor: LEFT"
+                        #print "Motor: LEFT"
                         self.left(speed)
                     elif direction == "right":
-                        print "Motor: RIGHT"
+                        #print "Motor: RIGHT"
                         self.right(speed)
-
-                    time.sleep(1)
-                    self.stop()
-                    print self.name, " - MOVING DONE!"
 
         def cleanup(self):
             pass

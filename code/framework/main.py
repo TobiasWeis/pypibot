@@ -18,6 +18,10 @@ from multiprocessing import Process, Manager
 
 from modules import BRAIN,CAM,US,MEM,MOT,LIDAR
 
+from modules import SIMU
+
+_simulate = True
+
 Config = ConfigParser.ConfigParser()
 Config.read("config.ini")
 
@@ -27,9 +31,14 @@ md["shutdown"] = False
 
 procs = []
 
-lidar = LIDAR.LIDAR("LIDAR", Config, md)
+if _simulate:
+    lidar = SIMU.SIMU("LIDAR_SIM", Config, md)
+else:
+    lidar = LIDAR.LIDAR("LIDAR", Config, md)
 procs.append(lidar)
+lidar.init()
 lidar.start()
+
 
 '''
 cam = CAM.CAM("CAM", Config, md)
@@ -55,10 +64,13 @@ mot.start()
 
 
 while not md["shutdown"]:
-    time.sleep(1)
+    time.sleep(.2)
 
     if "MCS" in md:
         md["MCS"]._print()
+
+    #if _simulate:
+    #    lidar.show()
 
     while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         line = sys.stdin.readline()
