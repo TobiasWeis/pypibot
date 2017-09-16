@@ -25,7 +25,6 @@ class SIMU(MP):
 
 
         self.lidar = []
-        self.lidar_rays = []
 
         self.visited_points = []
 
@@ -55,13 +54,18 @@ class SIMU(MP):
                     )
 
         # draw lidar rays
-        for ldar in self.lidar:
+        for idx,ldar in enumerate(self.lidar):
+            if idx == 0:
+                color = (255,0,255)
+            else:
+                color = (128,128,128)
+
             try:
                 lr = ldar[3:]
                 cv2.line(img,
                         (int(lr[0]/float(size)*res),int(lr[1]/float(size)*res)),
                         (int(lr[2]/float(size)*res),int(lr[3]/float(size)*res)),
-                        (128,128,128),
+                        color,
                         1
                         )
             except:
@@ -128,8 +132,8 @@ class SIMU(MP):
 	return np.array([[self.robot.x, self.robot.y],[self.robot.x+lx, self.robot.y+ly]])
 
     def eucl_dist(self,pa,pb):
-        a=pa[0]-pb[0]
-        b=pa[1]-pb[1]
+        a=float(pa[0]-pb[0])
+        b=float(pa[1]-pb[1])
         return math.sqrt(a*a + b*b)
 
     def ccw(self,A,B,C):
@@ -144,20 +148,35 @@ class SIMU(MP):
             simulate the lidar-beams w.r.t the robot position and the map
         '''
         self.lidar = (np.zeros((angles,7), np.float64) + [100.,0,0,0,0,0,0]) * [1., np.nan, np.nan,np.nan,np.nan,np.nan,np.nan]
-        self.lidar_rays = []
+        self.lidar_points = []
 
-        for alpha in range(angles):
+        # FIXME: this always starts at 0?! -> pointing up?!
+
+        for alpha_tmp in range(angles):
+            try:
+                alpha = alpha_tmp + self.md["WCS"].a
+            except:
+                alpha = alpha_tmp
+
             ll = self.get_line(math.radians(alpha))
+
             for lm in self.mymap:
                 # check if segments intersect at all, then calculate intersection
 		if self.seg_intersect_check(ll[0],ll[1],lm[0],lm[1]):
 		    intersect = self.seg_intersect(ll[0],ll[1],lm[0],lm[1])
 		    #print intersect
                     d = self.eucl_dist([self.robot.x,self.robot.y],intersect)
-		    if (d < 6) and (d < self.lidar[alpha][0]):
+		    if (d < 6) and (d < self.lidar[int(math.floor(alpha)) % 360][0]):
                         lli = [[self.robot.x,self.robot.y],[intersect[0],intersect[1]]]
-                        self.lidar[alpha] = [d,intersect[0],intersect[1],lli[0][0],lli[0][1],lli[1][0],lli[1][1]]
-        self.md["lidar"] = self.lidar[:,0] * 100
+
+                        x = d*100. * np.cos((alpha+0) * np.pi/180.)
+                        y = d*100. * np.sin((alpha+0) * np.pi/180.)
+
+                        self.lidar[int(math.floor(alpha)) % 360] = [d,intersect[0],intersect[1],lli[0][0],lli[0][1],lli[1][0],lli[1][1]]
+                        self.lidar_points.append([x,y])
+                        self.lidar[:,0] *= 100
+        self.md["lidar"] = self.lidar
+        self.md["lidar_points"] = self.lidar_points
 
     def run_impl(self):
         if "MCS" in self.md:
@@ -167,7 +186,7 @@ class SIMU(MP):
         self.visited_points.append(Coordinate(self.robot.x, self.robot.y, self.robot.a))
         self.calc_lidar()
         self.show()
-        time.sleep(0.1)
+        time.sleep(0.05)
 
 if __name__ == "__main__":
     md = {}

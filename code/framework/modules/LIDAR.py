@@ -14,7 +14,8 @@ class LIDAR(MP):
                 bytesize=serial.EIGHTBITS, 
                 timeout=0)
 
-        self.points = [np.nan] * 360 # create a 360-elements list with zeros
+        self.rays = [np.nan] * 360 # create a 360-elements list with zeros
+        self.points = []
         self.cnt = 0
         self.ss = time.time()
 
@@ -38,13 +39,6 @@ class LIDAR(MP):
 
         # first data package (4 bytes after header)
         angle = idx*4 + 0
-        '''
-        angle_rad = angle * math.pi / 180.
-        dist_mm = data[4] | ((data[5] & 0x1f) << 8)
-        quality = data[6] | (data[7] << 8)
-
-        self.points[angle] = dist_mm
-        '''
 
         for i in range(4):
             theta = angle + i
@@ -56,12 +50,17 @@ class LIDAR(MP):
             bad2 = data[(i*4)+5] & 0x40
 
             if not bad and not bad2:
-                self.points[theta] = dist_mm
+                self.rays[theta] = dist_mm
+                self.points.append([x,y])
+            else:
+                self.rays[theta] = np.nan
 
-        if angle == 0 or angle==1 or angle==2 or angle==3:
+        if angle == 0 or angle == 1 or angle == 2 or angle == 3:
             print time.time() - self.ss
             self.ss = time.time()
-            self.md["lidar"] = self.points
+            self.md["lidar_points"] = self.points
+            self.md["lidar"] = self.rays
+            self.points = []
 
     def run_impl(self): # overwrite baseclass, we do not need a loop here
         started = False

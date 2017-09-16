@@ -320,11 +320,13 @@ except:
             self.mcs_t = getMs() #-- get current time in milliseconds
 
             self.md["MCS"] = self.mcs 
+            # FIXME
+            self.md["WCS"] = self.mcs
 
             if "Move" in self.md:
                 if len(self.md["Move"]) == 2:
                     #-- get the command
-                    print self.name, " - MOVING!"
+                    #print self.name, " - MOVING!"
                     speed = self.md["Move"][0]
                     direction = self.md["Move"][1]
                     #-- take it out of the queue

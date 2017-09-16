@@ -1,6 +1,9 @@
 from MP import MP
 import time
 import numpy as np
+from MAP import *
+
+_debug = False
 
 class BRAIN(MP):
     def init(self):
@@ -8,25 +11,38 @@ class BRAIN(MP):
         self.issued_left = False
         self.issued_right = False
         self.issued_bwd = False
+        self.map = MAP()
 
     def run_impl(self):
+
         if "lidar" in self.md:
+
+            if "lidar_points" in self.md:
+                self.map.integrate(self.md["WCS"], self.md["lidar_points"])
+                self.map.visualize()
+
+            # build map using laser points
+
             free = True
 
-            for i in range(10,-10,-1):
-                m = self.md["lidar"][i]
+            for i in range(15,-15,-1):
+                m = self.md["lidar"][i][0]
                 
                 if np.isnan(m):
-                    print ". ",
+                    if _debug:
+                        print ". ",
                 elif m < 300:
-                    print "X ",
+                    if _debug:
+                        print "X ",
                     free = False
                 else:
-                    print "O ",
+                    if _debug:
+                        print "O ",
 
                 if not free:
                     break
-            print
+            if _debug:
+                print
 
             if not free:
                 self.md["Move"] = [35, "left"]
