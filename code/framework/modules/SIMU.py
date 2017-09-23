@@ -15,7 +15,7 @@ class SIMU(MP):
                 [[0,0],  [10,0]],
                 [[0,10], [0,0]],
                 [[10,10],[10,0]],
-                ])
+                ], dtype=np.float64)
 
         self.mymap = np.append(self.mymap,self.create_rect(0,9), axis=0)
         self.mymap = np.append(self.mymap,self.create_rect(2,3), axis=0)
@@ -37,7 +37,7 @@ class SIMU(MP):
                 [[sx+w,sy],[sx+w,sy+h]],
                 [[sx,sy],[sx+w,sy]],
                 [[sx,sy+h],[sx+w,sy+h]],
-            ])
+            ], dtype=np.float64)
         return rect
 
     def show(self, size=10, res=1000):
@@ -147,19 +147,20 @@ class SIMU(MP):
         '''
             simulate the lidar-beams w.r.t the robot position and the map
         '''
-        self.lidar = (np.zeros((angles,7), np.float64) + [100.,0,0,0,0,0,0]) * [1., np.nan, np.nan,np.nan,np.nan,np.nan,np.nan]
+        self.lidar = (np.zeros((angles,7), dtype=np.float64) + [100.,0,0,0,0,0,0]) * [1., np.nan, np.nan,np.nan,np.nan,np.nan,np.nan]
         self.lidar_points = []
 
         # FIXME: this always starts at 0?! -> pointing up?!
 
         for alpha_tmp in range(angles):
             try:
-                alpha = alpha_tmp + self.md["WCS"].a
+                alpha = float(alpha_tmp + self.md["WCS"].a)
             except:
-                alpha = alpha_tmp
+                alpha = float(alpha_tmp)
 
             ll = self.get_line(math.radians(alpha))
 
+            x = None
             for lm in self.mymap:
                 # check if segments intersect at all, then calculate intersection
 		if self.seg_intersect_check(ll[0],ll[1],lm[0],lm[1]):
@@ -169,12 +170,13 @@ class SIMU(MP):
 		    if (d < 6) and (d < self.lidar[int(math.floor(alpha)) % 360][0]):
                         lli = [[self.robot.x,self.robot.y],[intersect[0],intersect[1]]]
 
-                        x = d*100. * np.cos((alpha+0) * np.pi/180.)
-                        y = d*100. * np.sin((alpha+0) * np.pi/180.)
+                        x = d*100. * np.cos((alpha) * np.pi/180.)
+                        y = d*100. * np.sin((alpha) * np.pi/180.)
 
                         self.lidar[int(math.floor(alpha)) % 360] = [d,intersect[0],intersect[1],lli[0][0],lli[0][1],lli[1][0],lli[1][1]]
-                        self.lidar_points.append([x,y])
-                        self.lidar[:,0] *= 100
+            if x is not None:
+                self.lidar_points.append([x,y])
+        self.lidar[:,0] *= 100.
         self.md["lidar"] = self.lidar
         self.md["lidar_points"] = self.lidar_points
 

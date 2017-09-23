@@ -30,6 +30,9 @@ class MAP():
 
                 self.mappoints.append([x,y])
 
+                if len(self.mappoints) > 5000:
+                    self.mappoints = self.mappoints[len(self.mappoints)-5000:]
+
     def visualize(self):
         fig = plt.figure(3)
         plt.cla()
@@ -39,6 +42,9 @@ class MAP():
         plt.scatter(ps[:,0], ps[:,1], alpha=0.1)
 
         plt.axes().set_aspect('equal', 'datalim')
+
+        plt.xlim((-800,800))
+        plt.ylim((-800,800))
 
         plt.show()
         plt.pause(0.000001)
