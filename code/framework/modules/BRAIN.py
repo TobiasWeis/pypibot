@@ -16,7 +16,7 @@ class BRAIN(MP):
             if "lidar_points" in self.md:
                 # build map using laser points
                 self.map.integrate(self.md["WCS"], self.md["lidar_points"])
-                self.map.visualize()
+                self.map.visualize(((getMs()-self.md["starttime"]) / 1000.),save=True)
 
 
             free = True
@@ -27,7 +27,7 @@ class BRAIN(MP):
                 if np.isnan(m):
                     if _debug:
                         print ". ",
-                elif m < 100:
+                elif m < 1.:
                     if _debug:
                         print "X ",
                     free = False

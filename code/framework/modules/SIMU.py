@@ -109,6 +109,7 @@ class SIMU(MP):
 
 
         cv2.imshow("map",img)
+        cv2.imwrite("/tmp/ldimg.png",img) # FIXME: remove
         cv2.waitKey(10)
 
     def perp(self, a ) :
@@ -170,13 +171,13 @@ class SIMU(MP):
 		    if (d < 6) and (d < self.lidar[int(math.floor(alpha)) % 360][0]):
                         lli = [[self.robot.x,self.robot.y],[intersect[0],intersect[1]]]
 
-                        x = d*100. * np.cos((alpha) * np.pi/180.)
-                        y = d*100. * np.sin((alpha) * np.pi/180.)
+                        x = d * np.cos((alpha) * np.pi/180.) # m
+                        y = d * np.sin((alpha) * np.pi/180.) # m
 
                         self.lidar[int(math.floor(alpha)) % 360] = [d,intersect[0],intersect[1],lli[0][0],lli[0][1],lli[1][0],lli[1][1]]
             if x is not None:
                 self.lidar_points.append([x,y])
-        self.lidar[:,0] *= 100.
+        #self.lidar[:,0] *= 1000. #mm
         self.md["lidar"] = self.lidar
         self.md["lidar_points"] = self.lidar_points
 
@@ -188,6 +189,7 @@ class SIMU(MP):
         self.visited_points.append(Coordinate(self.robot.x, self.robot.y, self.robot.a))
         self.calc_lidar()
         self.show()
+
         time.sleep(0.05)
 
 if __name__ == "__main__":

@@ -303,9 +303,9 @@ except:
             #-- calculate movement of bot
             t = Coordinate()
             if self.motion == "forward":
-                t.x = diff_s * self.config.getfloat("MOT", "MPERS50") 
+                t.x = diff_s * self.config.getfloat("MOT", "MPERS50")  # m
             elif self.motion == "backward":
-                t.x = -diff_s * self.config.getfloat("MOT", "MPERS50") 
+                t.x = -diff_s * self.config.getfloat("MOT", "MPERS50")  # m
             elif self.motion == "left":
                 t.a = diff_s * math.radians(self.config.getfloat("MOT", "APERS50"))
             elif self.motion == "right":

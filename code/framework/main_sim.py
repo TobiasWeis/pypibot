@@ -29,6 +29,7 @@ Manager = Manager()
 md = Manager.dict()
 md["shutdown"] = False
 md["WCS"] = Coordinate(0.,0.,0.)
+md["starttime"] = getMs()
 
 procs = []
 
