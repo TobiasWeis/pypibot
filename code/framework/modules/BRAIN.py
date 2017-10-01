@@ -9,10 +9,16 @@ class BRAIN(MP):
     def init(self):
         self.map = MAP()
 
+
+    def explore(self):
+        # find most unexplored area, and drive there
+        pass
+
+
     def run_impl(self):
-
         if "lidar" in self.md:
-
+            if "MCS" in self.md:
+                self.md["WCS"] = self.md["MCS"]
             if "lidar_points" in self.md:
                 # build map using laser points
                 self.map.integrate(self.md["WCS"], self.md["lidar_points"])

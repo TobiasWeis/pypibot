@@ -190,7 +190,7 @@ class SIMU(MP):
         self.calc_lidar()
         self.show()
 
-        time.sleep(0.05)
+        #time.sleep(0.05)
 
 if __name__ == "__main__":
     md = {}
