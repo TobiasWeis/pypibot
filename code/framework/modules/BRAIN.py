@@ -14,6 +14,8 @@ class BRAIN(MP):
         # find most unexplored area, and drive there
         pass
 
+    def drive_to(self):
+        pass
 
     def run_impl(self):
         if "lidar" in self.md:
