@@ -26,24 +26,18 @@ class BRAIN(MP):
 
             free = True
 
-            for i in range(15,-15,-1):
-                m = self.md["lidar"][i][0]
-                
+            for i in range(10,-10,-1):
+                m = self.md["lidar"][i]
                 if np.isnan(m):
-                    if _debug:
-                        print ". ",
-                elif m < 1.:
-                    if _debug:
-                        print "X ",
+                    print ".",
+                elif m > 100 and m < 500:
+                    print "X",
                     free = False
                 else:
-                    if _debug:
-                        print "O ",
+                    print "O",
 
-                if not free:
-                    break
-            if _debug:
-                print
+                print " ",
+            print
 
             if not free:
                 self.md["Move"] = [35, "left"]

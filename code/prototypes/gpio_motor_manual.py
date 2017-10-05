@@ -2,6 +2,8 @@
 import time
 import RPi.GPIO as GPIO
 
+import curses, time
+
 M1A = 5
 M1B = 3
 M1E = 7
@@ -38,21 +40,6 @@ GPIO.setup(M2E, GPIO.OUT)
 GPIO.output(M2A, GPIO.LOW)
 GPIO.output(M2B, GPIO.HIGH)
 
-#- M3 - left - back
-GPIO.setup(M3A, GPIO.OUT)
-GPIO.setup(M3B, GPIO.OUT)
-GPIO.setup(M3E, GPIO.OUT)
-
-GPIO.output(M3A, GPIO.LOW)
-GPIO.output(M3B, GPIO.HIGH)
-
-#- M4 - left - front
-GPIO.setup(M4A, GPIO.OUT)
-GPIO.setup(M4B, GPIO.OUT)
-GPIO.setup(M4E, GPIO.OUT)
-
-GPIO.output(M4A, GPIO.LOW)
-GPIO.output(M4B, GPIO.HIGH)
 
 #- M1
 p1 = GPIO.PWM(M1E, 100)
@@ -62,13 +49,6 @@ p1.start(0)
 p2 = GPIO.PWM(M2E, 100)
 p2.start(0)
 
-#- M3
-p3 = GPIO.PWM(M3E, 100)
-p3.start(0)
-
-#- M4
-p4 = GPIO.PWM(M4E, 100)
-p4.start(0)
 
 def neutral():
     GPIO.output(M1A, GPIO.LOW)
@@ -78,8 +58,6 @@ def neutral():
 
     p1.ChangeDutyCycle(0)
     p2.ChangeDutyCycle(0)
-    p3.ChangeDutyCycle(0)
-    p4.ChangeDutyCycle(0)
 
 def forward(t, pow=50):
     GPIO.output(M1A, GPIO.LOW)
@@ -87,18 +65,8 @@ def forward(t, pow=50):
     GPIO.output(M2A, GPIO.LOW)
     GPIO.output(M2B, GPIO.HIGH)
 
-    GPIO.output(M3A, GPIO.LOW)
-    GPIO.output(M3B, GPIO.HIGH)
-    GPIO.output(M4A, GPIO.LOW)
-    GPIO.output(M4B, GPIO.HIGH)
-
-
     p1.ChangeDutyCycle(pow)
     p2.ChangeDutyCycle(pow)
-    p3.ChangeDutyCycle(pow)
-    p4.ChangeDutyCycle(pow)
-    time.sleep(t)
-    neutral()
 
 def backward(t, pow=50):
     GPIO.output(M1B, GPIO.LOW)
@@ -106,90 +74,62 @@ def backward(t, pow=50):
     GPIO.output(M2B, GPIO.LOW)
     GPIO.output(M2A, GPIO.HIGH)
 
-    GPIO.output(M3B, GPIO.LOW)
-    GPIO.output(M3A, GPIO.HIGH)
-    GPIO.output(M4B, GPIO.LOW)
-    GPIO.output(M4A, GPIO.HIGH)
-
     p1.ChangeDutyCycle(pow)
     p2.ChangeDutyCycle(pow)
-    p3.ChangeDutyCycle(pow)
-    p4.ChangeDutyCycle(pow)
-    time.sleep(t)
-    neutral()
 
 def left(t, pow=80):
-    GPIO.output(M1A, GPIO.LOW)
-    GPIO.output(M1B, GPIO.HIGH)
+    GPIO.output(M1A, GPIO.HIGH)
+    GPIO.output(M1B, GPIO.LOW)
     GPIO.output(M2A, GPIO.LOW)
     GPIO.output(M2B, GPIO.HIGH)
 
-    GPIO.output(M3B, GPIO.LOW)
-    GPIO.output(M3A, GPIO.HIGH)
-    GPIO.output(M4B, GPIO.LOW)
-    GPIO.output(M4A, GPIO.HIGH)
-
     p1.ChangeDutyCycle(pow)
     p2.ChangeDutyCycle(pow)
-    p3.ChangeDutyCycle(pow)
-    p4.ChangeDutyCycle(pow)
-    time.sleep(t)
-    neutral()
 
 def right(t, pow=80):
-    GPIO.output(M1B, GPIO.LOW)
-    GPIO.output(M1A, GPIO.HIGH)
-    GPIO.output(M2B, GPIO.LOW)
+    GPIO.output(M1A, GPIO.LOW)
+    GPIO.output(M1B, GPIO.HIGH)
     GPIO.output(M2A, GPIO.HIGH)
-
-    GPIO.output(M3A, GPIO.LOW)
-    GPIO.output(M3B, GPIO.HIGH)
-    GPIO.output(M4A, GPIO.LOW)
-    GPIO.output(M4B, GPIO.HIGH)
+    GPIO.output(M2B, GPIO.LOW)
 
     p1.ChangeDutyCycle(pow)
     p2.ChangeDutyCycle(pow)
-    p3.ChangeDutyCycle(pow)
-    p4.ChangeDutyCycle(pow)
-    time.sleep(t)
-    neutral()
+
+def input_char(message):
+    try:
+        win = curses.initscr()
+        win.addstr(0, 0, message)
+        while True: 
+            ch = win.getch()
+            if ch in range(32, 127): break
+            time.sleep(0.05)
+    except: raise
+    finally:
+        curses.endwin()
+    return chr(ch)
+
 
 while True:
-    inp = raw_input()
-    if inp == 'w':
-        forward(2,35)
-    elif inp == 's':
-        backward(2,35)
-    elif inp == 'a':
-        left(0.7,35)
-    elif inp == 'd':
-        right(0.7,35)
-    print "INput: ", inp
+    c = input_char('wasd: drive, Space: Stop, q: exit')
 
-sys.exit()
-
-for i in range(20,101,10):
-    print i
-    p1.ChangeDutyCycle(i)
-    p2.ChangeDutyCycle(i)
-    p3.ChangeDutyCycle(i)
-    p4.ChangeDutyCycle(i)
-
-    time.sleep(3)
+    #inp = raw_input()
+    if c == 'w':
+        forward(0.05,45)
+    elif c == 's':
+        backward(0.05,45)
+    elif c == 'a':
+        left(0.05,25)
+    elif c == 'd':
+        right(0.05,25)
+    elif c == ' ':
+        neutral()
+    elif c == 'q':
+        break
 
 GPIO.output(M1A, GPIO.LOW)
 GPIO.output(M1B, GPIO.LOW)
 
 GPIO.output(M2A, GPIO.LOW)
 GPIO.output(M2B, GPIO.LOW)
-
-GPIO.output(M3A, GPIO.LOW)
-GPIO.output(M3B, GPIO.LOW)
-
-GPIO.output(M4A, GPIO.LOW)
-GPIO.output(M4B, GPIO.LOW)
-
-
-
 
 GPIO.cleanup()
