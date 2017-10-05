@@ -7,20 +7,17 @@ _debug = False
 
 class BRAIN(MP):
     def init(self):
-        self.map = MAP()
-
+        self.map = MAP(self.md)
 
     def explore(self):
         # find most unexplored area, and drive there
-        pass
-
-    def drive_to(self):
         pass
 
     def run_impl(self):
         if "lidar" in self.md:
             if "MCS" in self.md:
                 self.md["WCS"] = self.md["MCS"]
+
             if "lidar_points" in self.md:
                 # build map using laser points
                 self.map.integrate(self.md["WCS"], self.md["lidar_points"])
@@ -51,7 +48,16 @@ class BRAIN(MP):
             if not free:
                 self.md["Move"] = [35, "left"]
             else:
-                self.md["Move"] = [35, "forward"]
+                # try to drive to the least known map cell
+                target_coords = np.unravel_index(np.argmin(self.map.tiles), self.map.tiles.shape)
+                print "Minimal knowledge at tile: "
+                tmp = self.map.tile2coordm(target_coords[1], target_coords[0])
+                self.md["target"] = Coordinate(tmp[0], tmp[1], 0)
+                self.map.wcs2rcs(self.md["target"])
+                # first, rotate until we are facing it
+                # transfer map tile (WCS) to RCS to calculate relative angle
+                
+
         #time.sleep(0.1)
 
         '''

@@ -8,7 +8,8 @@ from utils import *
 from bresenham import bresenham
 
 class MAP():
-    def __init__(self):
+    def __init__(self, md):
+        self.md = md
         self.mappoints = []
         self.laser_offset = [0.,0.,0.]
         self.lastpos = None
@@ -22,6 +23,22 @@ class MAP():
                     )
                 )
         self.egopoints = None
+
+    def tile2coordm(self,row,col):
+        fst = (col - self.tiles.shape[1]/2.) * self.tilesize[1] + self.tilesize[1]/2.
+        snd = (row - self.tiles.shape[0]/2.) * self.tilesize[0] + self.tilesize[0]/2.
+        return fst,snd 
+
+    def wcs2rcs(self, coordinate):
+        p = np.array([coordinate.x,coordinate.y])
+        R = np.array([
+                [math.cos(self.md["WCS"].a), -math.sin(self.md["WCS"].a)],
+                [math.sin(self.md["WCS"].a), math.cos(self.md["WCS"].a)]
+                ])
+        t = np.array([self.md["WCS"].x, self.md["WCS"].y])
+        print "Point ", p, " is in WCS:"
+        print np.dot(p,R)+t
+        return np.dot(p,R)+t
 
     def integrate(self, pos, egopoints):
         # we know our current pose from the odometry,
