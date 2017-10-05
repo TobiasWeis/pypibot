@@ -17,8 +17,8 @@ import ConfigParser
 from multiprocessing import Process, Manager
 
 from modules import BRAIN,CAM,US,MEM,MOT,LIDAR
-
 from modules import SIMU
+from modules.utils import *
 
 _simulate = True
 
@@ -28,6 +28,8 @@ Config.read("config.ini")
 Manager = Manager()
 md = Manager.dict()
 md["shutdown"] = False
+md["WCS"] = Coordinate(0.,0.,0.)
+md["starttime"] = getMs()
 
 procs = []
 
@@ -37,7 +39,7 @@ else:
     lidar = LIDAR.LIDAR("LIDAR", Config, md)
 procs.append(lidar)
 lidar.init()
-lidar.start()
+#lidar.start()
 
 '''
 cam = CAM.CAM("CAM", Config, md)
@@ -54,16 +56,21 @@ mem.start()
 '''
 
 brain = BRAIN.BRAIN("BRAIN", Config, md)
+brain.init()
 procs.append(brain)
-brain.start()
+#brain.start()
 
 mot = MOT.MOT("MOT", Config, md)
+mot.init()
 procs.append(mot)
-mot.start()
+#mot.start()
 
 
 while not md["shutdown"]:
-    time.sleep(.2)
+    brain.run_impl()
+    mot.run_impl()
+    lidar.run_impl()
+    #time.sleep(.2)
 
     #if "MCS" in md:
     #    md["MCS"]._print()
