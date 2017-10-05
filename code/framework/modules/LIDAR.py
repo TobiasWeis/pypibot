@@ -57,6 +57,8 @@ class LIDAR(MP):
 
             if not bad and not bad2:
                 self.points[theta] = dist_mm
+            else:
+                self.points[theta] = -1.
 
         if angle == 0 or angle==1 or angle==2 or angle==3:
             print time.time() - self.ss
