@@ -40,8 +40,10 @@ class BRAIN(MP):
             print
 
             if not free:
-                self.md["Move"] = [35, "left"]
+                self.md["Move"] = [25, "left"]
             else:
+                self.md["Move"] = [25, "forward"]
+                '''
                 # try to drive to the least known map cell
                 target_coords = np.unravel_index(np.argmin(self.map.tiles), self.map.tiles.shape)
                 print "Minimal knowledge at tile: "
@@ -50,7 +52,7 @@ class BRAIN(MP):
                 self.map.wcs2rcs(self.md["target"])
                 # first, rotate until we are facing it
                 # transfer map tile (WCS) to RCS to calculate relative angle
-                
+                '''
 
         #time.sleep(0.1)
 

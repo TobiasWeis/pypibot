@@ -20,7 +20,7 @@ from modules import BRAIN,CAM,US,MEM,MOT,LIDAR
 
 from modules import SIMU
 
-_simulate = True
+_simulate = False
 
 Config = ConfigParser.ConfigParser()
 Config.read("config.ini")
@@ -60,7 +60,6 @@ brain.start()
 mot = MOT.MOT("MOT", Config, md)
 procs.append(mot)
 mot.start()
-
 
 while not md["shutdown"]:
     time.sleep(.2)
