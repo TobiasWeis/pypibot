@@ -2,6 +2,7 @@ from MP import MP
 import time
 import numpy as np
 from MAP import *
+from utils import *
 
 _debug = False
 
@@ -21,8 +22,14 @@ class BRAIN(MP):
             if "lidar_points" in self.md:
                 # build map using laser points
                 self.map.integrate(self.md["WCS"], self.md["lidar_points"])
-                self.map.visualize(((getMs()-self.md["starttime"]) / 1000.),save=True)
-
+                #self.map.visualize(((getMs()-self.md["starttime"]) / 1000.),save=True)
+                # save a snapshot of relevant data to files
+                tsnow = getMs()
+                np.save(self.md["lidar_points"], "%d_LIDAR"%tsnow)
+                coord = np.array([self.md["WCS"].x, self.md["WCS"].y, self.md["WCS"].a])
+                np.save(coord, "%d_WCS"%tsnow)
+                np.save(self.map.mappoints, "%d_MAPPOINTS"%tsnow)
+                np.save(self.map.tiles, "%d_TILES"%tsnow)
 
             free = True
 
