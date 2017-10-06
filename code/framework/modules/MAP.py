@@ -1,6 +1,6 @@
 from MP import MP
 import math
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 from utils import *
@@ -13,7 +13,7 @@ class MAP():
         self.mappoints = []
         self.laser_offset = [0.,0.,0.]
         self.lastpos = None
-        plt.ion()
+        #plt.ion()
         self.mapsize = [16,16] # m in x- and y-direction
         self.tilesize = [0.1,0.1] # how big a single cell should be
         self.tiles = np.zeros(
@@ -69,19 +69,26 @@ class MAP():
                             -int(y/self.tilesize[1])-self.tiles.shape[1]/2
                         ]
 
+                # FIXME: too computationally heavy
+                '''
                 try:
                     l = list(bresenham(tilepos[0],tilepos[1],tiletarget[0],tiletarget[1]))
                     for bpos in l:
                         self.tiles[-bpos[1],bpos[0]] += 0.5
                 except Exception, e:
                     print "Exception: ", e
+                '''
 
                 self.mappoints.append([x,y])
-                self.tiles[int(y/self.tilesize[1])+self.tiles.shape[1]/2,int(x/self.tilesize[0])+self.tiles.shape[0]/2] += 1
+                try:
+                    self.tiles[int(y/self.tilesize[1])+self.tiles.shape[1]/2,
+                            int(x/self.tilesize[0])+self.tiles.shape[0]/2] += 1
+                except Exception, e:
+                    pass
 
                 self.tiles = np.minimum(100,self.tiles)
 
-                if len(self.mappoints) > 5000:
+                if len(self.mappoints) > 1000:
                     self.mappoints = self.mappoints[len(self.mappoints)-5000:]
 
     def visualize(self, tick=0, save=False):

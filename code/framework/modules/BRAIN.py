@@ -15,9 +15,8 @@ class BRAIN(MP):
         pass
 
     def run_impl(self):
-        if "lidar" in self.md:
-            if "MCS" in self.md:
-                self.md["WCS"] = self.md["MCS"]
+        if "MCS" in self.md:
+            self.md["WCS"] = self.md["MCS"]
 
             if "lidar_points" in self.md:
                 # build map using laser points
@@ -25,31 +24,31 @@ class BRAIN(MP):
                 #self.map.visualize(((getMs()-self.md["starttime"]) / 1000.),save=True)
                 # save a snapshot of relevant data to files
                 tsnow = getMs()
-                np.save(self.md["lidar_points"], "%d_LIDAR"%tsnow)
+                np.save("/tmp/%d_LIDAR"%tsnow, self.md["lidar_points"])
                 coord = np.array([self.md["WCS"].x, self.md["WCS"].y, self.md["WCS"].a])
-                np.save(coord, "%d_WCS"%tsnow)
-                np.save(self.map.mappoints, "%d_MAPPOINTS"%tsnow)
-                np.save(self.map.tiles, "%d_TILES"%tsnow)
+                np.save("/tmp/%d_WCS"%tsnow,coord)
+                np.save("/tmp/%d_MAPPOINTS"%tsnow, self.map.mappoints)
+                np.save("/tmp/%d_TILES"%tsnow, self.map.tiles)
 
-            free = True
+                free = True
 
-            for i in range(10,-10,-1):
-                m = self.md["lidar"][i]
-                if np.isnan(m):
-                    print ".",
-                elif m > 100 and m < 500:
-                    print "X",
-                    free = False
+                for i in range(10,-10,-1):
+                    m = self.md["lidar"][i]
+                    if np.isnan(m):
+                        print ".",
+                    elif m > 100 and m < 500:
+                        print "X",
+                        free = False
+                    else:
+                        print "O",
+
+                    print " ",
+                print
+
+                if not free:
+                    self.md["Move"] = [100, "left"]
                 else:
-                    print "O",
-
-                print " ",
-            print
-
-            if not free:
-                self.md["Move"] = [25, "left"]
-            else:
-                self.md["Move"] = [25, "forward"]
+                    self.md["Move"] = [100, "forward"]
                 '''
                 # try to drive to the least known map cell
                 target_coords = np.unravel_index(np.argmin(self.map.tiles), self.map.tiles.shape)

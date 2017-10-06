@@ -115,12 +115,11 @@ class MOT(MP):
                     print "Motor: STOP"
                     self.stop()
 
-            # integrate motion to perform dead-reckoning
-            self.mcs = self.integrate_mcs()
-            self.md["MCS"] = self.mcs
-            self.mcs_t = getMs() #-- get current time in milliseconds
+        # integrate motion to perform dead-reckoning
+        self.mcs = self.integrate_mcs()
+        self.md["MCS"] = self.mcs
+        self.mcs_t = getMs() #-- get current time in milliseconds
 
     def cleanup(self):
         self.motor1.cleanup()
         self.motor2.cleanup()
-        GPIO.cleanup()

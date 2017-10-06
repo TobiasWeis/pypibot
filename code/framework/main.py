@@ -64,8 +64,8 @@ mot.start()
 while not md["shutdown"]:
     time.sleep(.2)
 
-    #if "MCS" in md:
-    #    md["MCS"]._print()
+    if "MCS" in md:
+        md["MCS"]._print()
 
     #if _simulate:
     #    lidar.show()
