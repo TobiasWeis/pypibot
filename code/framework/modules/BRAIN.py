@@ -18,6 +18,7 @@ class BRAIN(MP):
         if "MCS" in self.md:
             self.md["WCS"] = self.md["MCS"]
 
+
             if "lidar_points" in self.md:
                 # build map using laser points
                 self.map.integrate(self.md["WCS"], self.md["lidar_points"])
@@ -46,9 +47,9 @@ class BRAIN(MP):
                 print
 
                 if not free:
-                    self.md["Move"] = [100, "left"]
+                    self.md["Move"] = [30, "left"]
                 else:
-                    self.md["Move"] = [100, "forward"]
+                    self.md["Move"] = [30, "forward"]
                 '''
                 # try to drive to the least known map cell
                 target_coords = np.unravel_index(np.argmin(self.map.tiles), self.map.tiles.shape)

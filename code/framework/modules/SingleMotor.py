@@ -28,9 +28,11 @@ class SingleMotor():
 
     def set_mode(self, d):
         if d == "backward":
+            self.direction=-1
             GPIO.output(self.a, GPIO.HIGH)
             GPIO.output(self.b, GPIO.LOW)
         elif d == "forward":
+            self.direction=1
             GPIO.output(self.a, GPIO.LOW)
             GPIO.output(self.b, GPIO.HIGH)
         elif d == "block":
@@ -55,12 +57,10 @@ class SingleMotor():
         if delta == 0:
             pass # nothing happened
         elif delta == 1:
-            self.direction = 1
             self.cnt += 1
         elif delta == 2:
             self.cnt += 2*self.direction
         elif delta == 3:
-            self.direction = -1
             self.cnt -= 1
 
     def get_delta(self):
