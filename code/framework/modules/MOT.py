@@ -81,12 +81,12 @@ class MOT(MP):
         d1=self.motor1.get_delta()
         d2=self.motor2.get_delta()
 
-        b = 0.2
+        b = 0.22
         d = (d1+d2)/2.
         t = Coordinate()
         tmp_a = (d1-d2)/b
-        t.x = self.mcs.x + d*math.cos(self.mcs.a + tmp_a )
-        t.y = self.mcs.y - d*math.sin(self.mcs.a + tmp_a )
+        t.x = self.mcs.x + d*math.cos(self.mcs.a + tmp_a/2. )
+        t.y = self.mcs.y - d*math.sin(self.mcs.a + tmp_a/2. )
         t.a = self.mcs.a + tmp_a
         return t
         

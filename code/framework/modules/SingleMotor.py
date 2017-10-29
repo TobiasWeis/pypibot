@@ -65,7 +65,7 @@ class SingleMotor():
 
     def get_delta(self):
         self.check_encoder()
-        delta_m = self.cnt/float(35*14*3)*0.268 # circumference
+        delta_m = (self.cnt/float(35*14*3))*0.268 # circumference
         self.cnt = 0
         return delta_m
 
