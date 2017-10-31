@@ -17,11 +17,11 @@ class MOT(MP):
         self.mcs_t = getMs()
 
         try:
-            import RPi.GPIO as GPIO
+            #import RPi.GPIO as GPIO
             from SingleMotor import SingleMotor
 
-            GPIO.setwarnings(False)
-            GPIO.setmode(GPIO.BOARD)
+            #GPIO.setwarnings(False)
+            #GPIO.setmode(GPIO.BOARD)
 
             self.motor1 = SingleMotor(
                             self.config.getint("PINS", "MOTOR1A"),
@@ -39,7 +39,8 @@ class MOT(MP):
                             self.config.getint("PINS", "MOTOR2ENCB")
                             )
 
-        except: # no GPIO availabel means we simulate motors
+        except Exception as e: # no GPIO availabel means we simulate motors
+            print "EXCEPTION: ", e
             print "GPIO not available, using simulated motors"
             from SingleMotorSimulated import SingleMotorSimulated
             self.motor1 = SingleMotorSimulated(
@@ -60,14 +61,14 @@ class MOT(MP):
         self.motor2.set_speed(speed)
 
     def left(self,speed):
-        self.motor1.set_mode("forward")
-        self.motor2.set_mode("backward")
+        self.motor1.set_mode("backward")
+        self.motor2.set_mode("forward")
         self.motor1.set_speed(speed)
         self.motor2.set_speed(speed)
         
     def right(self,speed):
-        self.motor1.set_mode("backward")
-        self.motor2.set_mode("forward")
+        self.motor1.set_mode("forward")
+        self.motor2.set_mode("backward")
         self.motor1.set_speed(speed)
         self.motor2.set_speed(speed)
         
@@ -119,6 +120,11 @@ class MOT(MP):
         self.mcs = self.integrate_mcs()
         self.md["MCS"] = self.mcs
         self.mcs_t = getMs() #-- get current time in milliseconds
+
+        coord = np.array([self.mcs.x, self.mcs.y, self.mcs.a])
+        tsnow = getMs()
+        np.save("/tmp/%d_WCS"%tsnow,coord)
+
 
     def cleanup(self):
         self.motor1.cleanup()
