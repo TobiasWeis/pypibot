@@ -121,9 +121,9 @@ class MOT(MP):
         self.md["MCS"] = self.mcs
         self.mcs_t = getMs() #-- get current time in milliseconds
 
-        coord = np.array([self.mcs.x, self.mcs.y, self.mcs.a])
-        tsnow = getMs()
-        np.save("/tmp/%d_WCS"%tsnow,coord)
+        #coord = np.array([self.mcs.x, self.mcs.y, self.mcs.a])
+        #tsnow = getMs()
+        #np.save("/tmp/%d_WCS"%tsnow,coord)
 
 
     def cleanup(self):

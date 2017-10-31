@@ -24,12 +24,12 @@ class BRAIN(MP):
                 self.map.integrate(self.md["WCS"], self.md["lidar_points"])
                 #self.map.visualize(((getMs()-self.md["starttime"]) / 1000.),save=True)
                 # save a snapshot of relevant data to files
-                #tsnow = getMs()
-                #np.save("/tmp/%d_LIDAR"%tsnow, self.md["lidar_points"])
-                #coord = np.array([self.md["WCS"].x, self.md["WCS"].y, self.md["WCS"].a])
-                #np.save("/tmp/%d_WCS"%tsnow,coord)
-                #np.save("/tmp/%d_MAPPOINTS"%tsnow, self.map.mappoints)
-                #np.save("/tmp/%d_TILES"%tsnow, self.map.tiles)
+                tsnow = getMs()
+                np.save("/tmp/%d_LIDAR"%tsnow, self.md["lidar_points"])
+                coord = np.array([self.md["WCS"].x, self.md["WCS"].y, self.md["WCS"].a])
+                np.save("/tmp/%d_WCS"%tsnow,coord)
+                np.save("/tmp/%d_MAPPOINTS"%tsnow, self.map.mappoints)
+                np.save("/tmp/%d_TILES"%tsnow, self.map.tiles)
 
                 free = True
 
@@ -50,6 +50,9 @@ class BRAIN(MP):
                     self.md["Move"] = [120, "left"] # was 0-100, now 0-255
                 else:
                     self.md["Move"] = [120, "forward"]
+
+                del self.md["lidar_points"]
+
                 '''
                 # try to drive to the least known map cell
                 target_coords = np.unravel_index(np.argmin(self.map.tiles), self.map.tiles.shape)
