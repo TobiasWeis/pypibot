@@ -94,14 +94,14 @@ class SingleMotor():
         return (a ^ b) | b << 1
 
     def get_state(self, gpio, level, tick):
+        curr = getMs()
         if level == 1:
-            curr = getMs()
             self.pid_queue.append(curr) # push ts in a queue 
             # remove elements from queue that are older than 100Ms
             for elem in list(self.pid_queue):
                 if curr - elem > 100:
                     self.pid_queue.popleft()
-            self.cnt += 1
+            self.cnt += self.direction*1
 
         # PID loop
         '''
@@ -114,13 +114,14 @@ class SingleMotor():
 
         if getMs() - self.pid_ts >= self.PID_UPDATE_INT_MS:
             # calculate speed in m/s over the last 100Ms
-            tmpdelta = self.cnt_to_m(len(d)) # this is the distance of the last 100Ms
+            tmpdelta = self.cnt_to_m(len(self.pid_queue)) # this is the distance of the last 100Ms
             err = self.speed_ms - tmpdelta*(1000./self.PID_UPDATE_INT_MS)
             self.pid_integral += err
             deriv = (err - self.pid_last_error)/(1000./self.PID_UPDATE_INT_MS)
             out = self.pid_kp*err + self.pid_ki*self.pid_integral
             self.PID_UPDATE_INT_MS = curr
             self.pid_last_error = err
+            self.pi.set_PWM_dutycycle(self.e, out)
 
     def check_encoder(self):
         '''
@@ -157,7 +158,8 @@ class SingleMotor():
         with the PID, this speed should be in m/s
         '''
         self.speed_ms = speed
-        self.pi.set_PWM_dutycycle(self.e, speed)
+        self.get_state(0,0,0)
+        #self.pi.set_PWM_dutycycle(self.e, speed)
         #self.p.ChangeDutyCycle(speed)
 
     def cleanup(self):
