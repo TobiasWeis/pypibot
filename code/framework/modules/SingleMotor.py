@@ -122,6 +122,7 @@ class SingleMotor():
             self.PID_UPDATE_INT_MS = curr
             self.pid_last_error = err
             self.pi.set_PWM_dutycycle(self.e, out)
+            self.pid_ts = curr
 
     def check_encoder(self):
         '''
