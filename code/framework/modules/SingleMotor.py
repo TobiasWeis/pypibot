@@ -1,5 +1,7 @@
 #import RPi.GPIO as GPIO
 import pigpio
+from utils import *
+import collections
 
 class SingleMotor():
     def __init__(self,a,b,e,enca,encb):
@@ -37,11 +39,21 @@ class SingleMotor():
         #self.cbb=self.pi.callback(self.encb, pigpio.EITHER_EDGE, self.get_state)
 
         self.set_mode("release")
+        self.speed_ms = 0
 
         # set up variables for encoder comptuations
         self.old_seq = 0
         self.direction = 0
         self.cnt = 0
+
+        self.PID_UPDATE_INT_MS = 10
+        self.pid_ts = 0
+        self.pid_queue = collections.deque()
+        self.pid_kp = 1.
+        self.pid_ki = 0.
+        self.pid_kd = 0.
+        self.pid_last_error = 0.
+        self.pid_integral = 0.
 
         # setup PWM on enable port
         self.pi.set_PWM_dutycycle(self.e, 0)
@@ -83,17 +95,37 @@ class SingleMotor():
 
     def get_state(self, gpio, level, tick):
         if level == 1:
+            curr = getMs()
+            self.pid_queue.append(curr) # push ts in a queue 
+            # remove elements from queue that are older than 100Ms
+            for elem in list(self.pid_queue):
+                if curr - elem > 100:
+                    self.pid_queue.popleft()
             self.cnt += 1
 
+        # PID loop
         '''
-        reada = self.pi.read(self.enca)
+        self.pid_kp = 1.
+        self.pid_ki = 1.
+        self.pid_kd = 1.
+        self.pid_last_error = 0.
+        self.pid_integral = 0.
+        '''
 
-        if self.lasta < reada:
-            self.cnt += 1
-        self.lasta = reada
-        '''
+        if getMs() - self.pid_ts >= self.PID_UPDATE_INT_MS:
+            # calculate speed in m/s over the last 100Ms
+            tmpdelta = self.cnt_to_m(len(d)) # this is the distance of the last 100Ms
+            err = self.speed_ms - tmpdelta*(1000./self.PID_UPDATE_INT_MS)
+            self.pid_integral += err
+            deriv = (err - self.pid_last_error)/(1000./self.PID_UPDATE_INT_MS)
+            out = self.pid_kp*err + self.pid_ki*self.pid_integral
+            self.PID_UPDATE_INT_MS = curr
+            self.pid_last_error = err
 
     def check_encoder(self):
+        '''
+        here for legacy reasons
+        '''
         seq = self.get_seq()
         delta = (seq - self.old_seq) % 4
         self.old_seq = seq
@@ -107,14 +139,24 @@ class SingleMotor():
         elif delta == 3:
             self.cnt -= 1
 
+    def cnt_to_m(self,cnt):
+        return (cnt/float(350))*0.26 # circumference
+
     def get_delta(self):
+        '''
+        called from outside.
+        cnt updated through interrupts and callback to get_state
+        '''
         #self.check_encoder()
-        #self.get_state()
-        delta_m = (self.cnt/float(350))*0.26 # circumference
+        delta_m = self.cnt_to_m(self.cnt) 
         self.cnt = 0
         return delta_m
 
     def set_speed(self,speed):
+        '''
+        with the PID, this speed should be in m/s
+        '''
+        self.speed_ms = speed
         self.pi.set_PWM_dutycycle(self.e, speed)
         #self.p.ChangeDutyCycle(speed)
 
