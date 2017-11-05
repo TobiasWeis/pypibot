@@ -47,9 +47,9 @@ class BRAIN(MP):
                 print
 
                 if not free:
-                    self.md["Move"] = [120, "left"] # was 0-100, now 0-255
+                    self.md["Move"] = [0.01, "left"] # was 0-100, now 0-255
                 else:
-                    self.md["Move"] = [120, "forward"]
+                    self.md["Move"] = [0.01, "forward"]
 
                 del self.md["lidar_points"]
 

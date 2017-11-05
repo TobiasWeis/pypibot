@@ -28,7 +28,8 @@ class MOT(MP):
                             self.config.getint("PINS", "MOTOR1B"),
                             self.config.getint("PINS", "MOTOR1E"),
                             self.config.getint("PINS", "MOTOR1ENCA"),
-                            self.config.getint("PINS", "MOTOR1ENCB")
+                            self.config.getint("PINS", "MOTOR1ENCB"),
+                            "MOTLEFT"
                             )
 
             self.motor2 = SingleMotor(
@@ -36,7 +37,8 @@ class MOT(MP):
                             self.config.getint("PINS", "MOTOR2B"),
                             self.config.getint("PINS", "MOTOR2E"),
                             self.config.getint("PINS", "MOTOR2ENCA"),
-                            self.config.getint("PINS", "MOTOR2ENCB")
+                            self.config.getint("PINS", "MOTOR2ENCB"),
+                            "MOTRIGHT"
                             )
 
         except Exception as e: # no GPIO availabel means we simulate motors
