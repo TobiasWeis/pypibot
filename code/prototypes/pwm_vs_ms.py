@@ -22,17 +22,32 @@ motor1 = SingleMotor(
                 False
                 )
 
+motor2 = SingleMotor(
+                Config.getint("PINS", "MOTOR2A"),
+                Config.getint("PINS", "MOTOR2B"),
+                Config.getint("PINS", "MOTOR2E"),
+                Config.getint("PINS", "MOTOR2ENCA"),
+                Config.getint("PINS", "MOTOR2ENCB"),
+                "MOTRIGHT",
+                False
+                )
+
+
 motor1.set_mode("forward")
+motor2.set_mode("forward")
 
 p = 0.1 # how many seconds between delta-updates
 
 speeds = []
-for pwm in range(0,255,5):
+for pwm in range(70,255,10):
     motor1.pi.set_PWM_dutycycle(motor1.e, pwm)
+    motor2.pi.set_PWM_dutycycle(motor2.e, pwm)
+
     readings = []
     ss = time.time()
     while time.time() - ss < 5:
         d = motor1.get_delta()
+        d2 = motor2.get_delta()
         #print d, " -> ",d*(1./p)," m/s"
         time.sleep(p)
 
@@ -43,9 +58,18 @@ for pwm in range(0,255,5):
     print "Average speed for PWM-value ",pwm,": ",np.sum(readings)/float(len(readings))
     speeds.append([pwm, np.sum(readings)/float(len(readings))])
 
+    # pause so I can turn the bot
+    motor1.pi.set_PWM_dutycycle(motor1.e,0)
+    motor2.pi.set_PWM_dutycycle(motor2.e,0)
+    time.sleep(5)
+
 
 motor1.set_mode("release")
 motor1.pi.set_PWM_dutycycle(motor1.e, 0)
+
+motor2.set_mode("release")
+motor2.pi.set_PWM_dutycycle(motor2.e, 0)
+
 
 speeds = np.array(speeds)
 
