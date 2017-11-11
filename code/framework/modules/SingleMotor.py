@@ -42,9 +42,9 @@ class SingleMotor():
         self.PID_UPDATE_INT_MS = 100
         self.pid_ts = 0
         self.pid_queue = collections.deque()
-        self.pid_kp = 800.
-        self.pid_ki = 0.
-        self.pid_kd = 0.
+        self.pid_kp = 1.0
+        self.pid_ki = 1.0
+        self.pid_kd = 1.0
         self.pid_last_error = 0.
         self.pid_integral = 0.
 
@@ -97,11 +97,17 @@ class SingleMotor():
                 err = self.speed_ms - tmpdelta*(1000./self.PID_UPDATE_INT_MS)
                 self.pid_integral += err
                 deriv = (err - self.pid_last_error)
-                out = max(0,min(255, int(self.pid_kp*err + self.pid_ki*self.pid_integral + self.pid_kd*deriv)))
+                out = self.pid_kp*err + self.pid_ki*self.pid_integral + self.pid_kd*deriv
 
-                print "[",self.name,"]-------------------PID: delta: ",tmpdelta*(1000./self.PID_UPDATE_INT_MS),", err: ",err,", out: ", out
+                # translate "out"-value (m/s) to pwm value
+                if out < 0: out = 0.0
+                if out > 0.7: out = 0.7
+                out_pwm = min(255, max(0, int(64.46*out*out*out + 310.2*out*out - 2.388*out + 41.16)))
+
+
+                print "[",self.name,"]-------------------PID: delta: ",tmpdelta*(1000./self.PID_UPDATE_INT_MS),", err: ",err,", out: ", out, ", out_pwm: ", out_pwm
                 self.pid_last_error = err
-                self.pi.set_PWM_dutycycle(self.e, out)
+                self.pi.set_PWM_dutycycle(self.e, out_pwm)
                 self.pid_ts = curr
 
     def check_encoder(self):

@@ -39,7 +39,7 @@ motor2.set_mode("forward")
 p = 0.1 # how many seconds between delta-updates
 
 speeds = []
-for pwm in range(70,255,10):
+for pwm in range(0,255,10):
     motor1.pi.set_PWM_dutycycle(motor1.e, pwm)
     motor2.pi.set_PWM_dutycycle(motor2.e, pwm)
 
