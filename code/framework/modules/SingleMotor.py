@@ -42,9 +42,9 @@ class SingleMotor():
         self.PID_UPDATE_INT_MS = 100
         self.pid_ts = 0
         self.pid_queue = collections.deque()
-        self.pid_kp = 1.0
-        self.pid_ki = 1.0
-        self.pid_kd = 1.0
+        self.pid_kp = 1.
+        self.pid_ki = 0.5
+        self.pid_kd = 1.5
         self.pid_last_error = 0.
         self.pid_integral = 0.
 
@@ -90,8 +90,8 @@ class SingleMotor():
 
             # PID loop
             if (curr - self.pid_ts) >= self.PID_UPDATE_INT_MS:
-                print "[",self.name,"] (",len(self.pid_queue),") Queue: " #, self.pid_queue
-                print "[",self.name,"] DIFF: ", (curr - self.pid_ts)
+                #print "[",self.name,"] (",len(self.pid_queue),") Queue: " #, self.pid_queue
+                #print "[",self.name,"] DIFF: ", (curr - self.pid_ts)
                 # calculate speed in m/s over the last 100Ms
                 tmpdelta = self.cnt_to_m(len(self.pid_queue)) # this is the distance of the last 100Ms
                 err = self.speed_ms - tmpdelta*(1000./self.PID_UPDATE_INT_MS)
@@ -105,7 +105,7 @@ class SingleMotor():
                 out_pwm = min(255, max(0, int(64.46*out*out*out + 310.2*out*out - 2.388*out + 41.16)))
 
 
-                print "[",self.name,"]-------------------PID: delta: ",tmpdelta*(1000./self.PID_UPDATE_INT_MS),", err: ",err,", out: ", out, ", out_pwm: ", out_pwm
+                #print "[",self.name,"]-------------------PID: delta: ",tmpdelta*(1000./self.PID_UPDATE_INT_MS),", err: ",err,", out: ", out, ", out_pwm: ", out_pwm
                 self.pid_last_error = err
                 self.pi.set_PWM_dutycycle(self.e, out_pwm)
                 self.pid_ts = curr

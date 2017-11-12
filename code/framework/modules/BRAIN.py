@@ -15,9 +15,24 @@ class BRAIN(MP):
         pass
 
     def run_impl(self):
+        # first, check bumper
+        if "Bumper" in self.md:
+            print "==========================================================="
+            print "============  BUMPER           ============================"
+            print "==========================================================="
+            print "==========================================================="
+            # hardcoded evade behavior
+            self.md["Move"] = [0.2, "backward"]
+            time.sleep(2)
+            self.md["Move"] = [0.2, "left"]
+            time.sleep(2)
+
+            del self.md["Bumper"]
+            return
+
+        # next, if we have odometry, save and react to laser input
         if "MCS" in self.md:
             self.md["WCS"] = self.md["MCS"]
-
 
             if "lidar_points" in self.md:
                 # build map using laser points
@@ -47,9 +62,9 @@ class BRAIN(MP):
                 print
 
                 if not free:
-                    self.md["Move"] = [0.5, "left"] # was 0-100, now 0-255
+                    self.md["Move"] = [0.1, "left"] # was 0-100, now 0-255
                 else:
-                    self.md["Move"] = [0.5, "forward"]
+                    self.md["Move"] = [0.1, "forward"]
 
                 del self.md["lidar_points"]
 

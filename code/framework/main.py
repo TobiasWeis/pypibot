@@ -16,7 +16,7 @@ import ConfigParser
 
 from multiprocessing import Process, Manager
 
-from modules import BRAIN,CAM,US,MEM,MOT,LIDAR
+from modules import BRAIN,CAM,US,MEM,MOT,LIDAR,BUMPER
 
 from modules import SIMU
 
@@ -38,6 +38,11 @@ else:
 procs.append(lidar)
 lidar.init()
 lidar.start()
+
+bumper = BUMPER.BUMPER("BUMPER", Config, md)
+procs.append(bumper)
+bumper.init()
+bumper.start()
 
 '''
 cam = CAM.CAM("CAM", Config, md)
