@@ -67,7 +67,7 @@ procs.append(mot)
 mot.start()
 
 while not md["shutdown"]:
-    time.sleep(.2)
+    time.sleep(1)
 
     if "MCS" in md:
         md["MCS"]._print()

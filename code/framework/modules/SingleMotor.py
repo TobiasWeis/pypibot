@@ -42,9 +42,9 @@ class SingleMotor():
         self.PID_UPDATE_INT_MS = 20
         self.pid_ts = 0
         self.pid_queue = collections.deque()
-        self.pid_kp = 3.
-        self.pid_ki = 1.
-        self.pid_kd = 2.
+        self.pid_kp = 5.0
+        self.pid_ki = 0.3
+        self.pid_kd = 0.0
         self.pid_last_error = 0.
         self.pid_integral = 0.
 

@@ -56,7 +56,7 @@ class LIDAR(MP):
                 self.rays[theta] = np.nan
 
         if angle == 0 or angle == 1 or angle == 2 or angle == 3:
-            print time.time() - self.ss
+            #print time.time() - self.ss
             self.ss = time.time()
             self.md["lidar_points"] = self.points
             self.md["lidar"] = self.rays

@@ -25,9 +25,12 @@ class BRAIN(MP):
             self.md["Move"] = [0.2, "backward"]
             time.sleep(2)
             self.md["Move"] = [0.2, "left"]
-            time.sleep(2)
+            time.sleep(1)
 
             del self.md["Bumper"]
+
+            #clean up from this round
+            del self.md["lidar_points"]
             return
 
         # next, if we have odometry, save and react to laser input
@@ -66,7 +69,7 @@ class BRAIN(MP):
                 if not free:
                     self.md["Move"] = [0.2, "left"] # was 0-100, now 0-255
                 else:
-                    self.md["Move"] = [0.2, "forward"]
+                    self.md["Move"] = [0.3, "forward"]
 
                 del self.md["lidar_points"]
 
