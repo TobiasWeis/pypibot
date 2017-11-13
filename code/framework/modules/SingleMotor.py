@@ -39,17 +39,23 @@ class SingleMotor():
         self.direction = 0
         self.cnt = 0
 
-        self.PID_UPDATE_INT_MS = 100
+        self.PID_UPDATE_INT_MS = 20
         self.pid_ts = 0
         self.pid_queue = collections.deque()
-        self.pid_kp = 1.
-        self.pid_ki = 0.5
-        self.pid_kd = 1.5
+        self.pid_kp = 3.
+        self.pid_ki = 1.
+        self.pid_kd = 2.
         self.pid_last_error = 0.
         self.pid_integral = 0.
 
         # setup PWM on enable port
         self.pi.set_PWM_dutycycle(self.e, 0)
+        
+        # FIXME: remove
+        self.outfile = open("/tmp/pid_out_%s_%.2f_%.2f_%.2f.txt" % (self.name, self.pid_kp, self.pid_ki, self.pid_kd), "w")
+        self.outfile.write("HEADER: Kp: %f, Ki: %f, Kd: %f\n" % (self.pid_kp, self.pid_ki, self.pid_kd))
+        self.outfile.write("HEADER: tsnow, tmpdelta, err, self.pid_integral, deriv, out, out_pwm\n")
+
 
     def set_mode(self, d):
         if d == "backward":
@@ -83,7 +89,7 @@ class SingleMotor():
 
         if self.use_pid:
             for elem in list(self.pid_queue): # remove elements from queue that are older than 100Ms
-                if curr - elem > 100:
+                if curr - elem > self.PID_UPDATE_INT_MS:
                     self.pid_queue.popleft()
                 else:
                     break
@@ -94,16 +100,24 @@ class SingleMotor():
                 #print "[",self.name,"] DIFF: ", (curr - self.pid_ts)
                 # calculate speed in m/s over the last 100Ms
                 tmpdelta = self.cnt_to_m(len(self.pid_queue)) # this is the distance of the last 100Ms
-                err = self.speed_ms - tmpdelta*(1000./self.PID_UPDATE_INT_MS)
+                #print self.speed_ms,"-",tmpdelta*(1000./float(self.PID_UPDATE_INT_MS)), "-", self.speed_ms - tmpdelta*(1000./float(self.PID_UPDATE_INT_MS))
+                err = self.speed_ms - tmpdelta*(1000./float(self.PID_UPDATE_INT_MS))
                 self.pid_integral += err
                 deriv = (err - self.pid_last_error)
                 out = self.pid_kp*err + self.pid_ki*self.pid_integral + self.pid_kd*deriv
 
                 # translate "out"-value (m/s) to pwm value
-                if out < 0: out = 0.0
+                #if out < 0: out = 0.0
                 if out > 0.7: out = 0.7
-                out_pwm = min(255, max(0, int(64.46*out*out*out + 310.2*out*out - 2.388*out + 41.16)))
 
+                if out <= 0:
+                    out_pwm = 0 # if we fall below the threshold, there is anyway zero output
+                else:
+                    out_pwm = min(255, max(0, int(64.46*out*out*out + 310.2*out*out - 2.388*out + 51.16)))
+
+
+                tsnow = getMs()
+                self.outfile.write("%d, %f, %f, %f, %f, %f, %d\n" % (tsnow, tmpdelta, err, self.pid_integral, deriv, out, out_pwm))
 
                 #print "[",self.name,"]-------------------PID: delta: ",tmpdelta*(1000./self.PID_UPDATE_INT_MS),", err: ",err,", out: ", out, ", out_pwm: ", out_pwm
                 self.pid_last_error = err
@@ -154,4 +168,5 @@ class SingleMotor():
         self.set_mode("release")
         self.cba.cancel()
         #self.cbb.cancel()
+        self.outfile.close()
 
