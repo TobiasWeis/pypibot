@@ -39,12 +39,12 @@ class SingleMotor():
         self.direction = 0
         self.cnt = 0
 
-        self.PID_UPDATE_INT_MS = 20
+        self.PID_UPDATE_INT_MS = 50
         self.pid_ts = 0
         self.pid_queue = collections.deque()
-        self.pid_kp = 5.0
-        self.pid_ki = 0.3
-        self.pid_kd = 0.0
+        self.pid_kp = 50.0
+        self.pid_ki = 10.0
+        self.pid_kd = 2.0
         self.pid_last_error = 0.
         self.pid_integral = 0.
 
@@ -95,15 +95,16 @@ class SingleMotor():
                     break
 
             # PID loop
-            if (curr - self.pid_ts) >= self.PID_UPDATE_INT_MS:
+            dt = curr - self.pid_ts
+            if dt >= self.PID_UPDATE_INT_MS:
                 #print "[",self.name,"] (",len(self.pid_queue),") Queue: " #, self.pid_queue
                 #print "[",self.name,"] DIFF: ", (curr - self.pid_ts)
                 # calculate speed in m/s over the last 100Ms
                 tmpdelta = self.cnt_to_m(len(self.pid_queue)) # this is the distance of the last 100Ms
                 #print self.speed_ms,"-",tmpdelta*(1000./float(self.PID_UPDATE_INT_MS)), "-", self.speed_ms - tmpdelta*(1000./float(self.PID_UPDATE_INT_MS))
-                err = self.speed_ms - tmpdelta*(1000./float(self.PID_UPDATE_INT_MS))
-                self.pid_integral += err
-                deriv = (err - self.pid_last_error)
+                err = self.speed_ms - tmpdelta*(1000./float(dt))
+                self.pid_integral += err*dt
+                deriv = (err - self.pid_last_error)/dt
                 out = self.pid_kp*err + self.pid_ki*self.pid_integral + self.pid_kd*deriv
 
                 # translate "out"-value (m/s) to pwm value

@@ -68,6 +68,7 @@ for f in files:
                 ax2 = ax1.twinx()
                 ax2.plot(valuelist_r[:,0]-mints, valuelist_r[:,i+1],'ok--', label=strings[i+1])
             elif strings[i+1] == "pid_integral":
+                ax1.plot(valuelist_r[:,0]-mints, valuelist_r[:,i+1], label=strings[i+1])
                 pass
             else:
                 ax1.plot(valuelist_r[:,0]-mints, valuelist_r[:,i+1], label=strings[i+1])
