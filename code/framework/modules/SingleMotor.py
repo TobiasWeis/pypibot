@@ -43,7 +43,7 @@ class SingleMotor():
         self.pid_ts = getMs()
         self.pid_queue = collections.deque()
         self.pid_kp = 3.0
-        self.pid_ki = 0.5
+        self.pid_ki = 0.7
         self.pid_kd = 0.0
         self.pid_last_error = 0.
         self.pid_integral = 0.
@@ -104,7 +104,7 @@ class SingleMotor():
                 #print self.speed_ms,"-",tmpdelta*(1000./float(self.PID_UPDATE_INT_MS)), "-", self.speed_ms - tmpdelta*(1000./float(self.PID_UPDATE_INT_MS))
                 err = self.speed_ms - tmpdelta*(1000./float(dt))
                 self.pid_integral += err
-                self.pid_integral = min(1.0, max(-1.0, self.pid_integral))
+                self.pid_integral = min(2.0, max(-2.0, self.pid_integral))
                 deriv = (err - self.pid_last_error)
                 out = self.pid_kp*err + self.pid_ki*self.pid_integral + self.pid_kd*deriv
 
