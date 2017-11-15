@@ -40,11 +40,11 @@ class SingleMotor():
         self.cnt = 0
 
         self.PID_UPDATE_INT_MS = 50
-        self.pid_ts = 0
+        self.pid_ts = getMs()
         self.pid_queue = collections.deque()
-        self.pid_kp = 50.0
-        self.pid_ki = 10.0
-        self.pid_kd = 2.0
+        self.pid_kp = 3.0
+        self.pid_ki = 0.5
+        self.pid_kd = 0.0
         self.pid_last_error = 0.
         self.pid_integral = 0.
 
@@ -54,7 +54,7 @@ class SingleMotor():
         # FIXME: remove
         self.outfile = open("/tmp/pid_out_%s_%.2f_%.2f_%.2f.txt" % (self.name, self.pid_kp, self.pid_ki, self.pid_kd), "w")
         self.outfile.write("HEADER: Kp: %f, Ki: %f, Kd: %f\n" % (self.pid_kp, self.pid_ki, self.pid_kd))
-        self.outfile.write("HEADER: tsnow, tmpdelta, err, self.pid_integral, deriv, out, out_pwm\n")
+        self.outfile.write("HEADER: tsnow, tmpdelta, err, self.pid_integral, deriv, out, out_pwm, dt, speed_ms\n")
 
 
     def set_mode(self, d):
@@ -103,8 +103,9 @@ class SingleMotor():
                 tmpdelta = self.cnt_to_m(len(self.pid_queue)) # this is the distance of the last 100Ms
                 #print self.speed_ms,"-",tmpdelta*(1000./float(self.PID_UPDATE_INT_MS)), "-", self.speed_ms - tmpdelta*(1000./float(self.PID_UPDATE_INT_MS))
                 err = self.speed_ms - tmpdelta*(1000./float(dt))
-                self.pid_integral += err*dt
-                deriv = (err - self.pid_last_error)/dt
+                self.pid_integral += err
+                self.pid_integral = min(1.0, max(-1.0, self.pid_integral))
+                deriv = (err - self.pid_last_error)
                 out = self.pid_kp*err + self.pid_ki*self.pid_integral + self.pid_kd*deriv
 
                 # translate "out"-value (m/s) to pwm value
@@ -114,11 +115,11 @@ class SingleMotor():
                 if out <= 0:
                     out_pwm = 0 # if we fall below the threshold, there is anyway zero output
                 else:
-                    out_pwm = min(255, max(0, int(64.46*out*out*out + 310.2*out*out - 2.388*out + 51.16)))
+                    out_pwm = min(255, max(0, int(64.46*out*out*out + 310.2*out*out - 2.388*out + 41.16)))
 
 
                 tsnow = getMs()
-                self.outfile.write("%d, %f, %f, %f, %f, %f, %d\n" % (tsnow, tmpdelta, err, self.pid_integral, deriv, out, out_pwm))
+                self.outfile.write("%d, %f, %f, %f, %f, %f, %d, %d, %f\n" % (tsnow, tmpdelta, err, self.pid_integral, deriv, out, out_pwm, dt, self.speed_ms))
 
                 #print "[",self.name,"]-------------------PID: delta: ",tmpdelta*(1000./self.PID_UPDATE_INT_MS),", err: ",err,", out: ", out, ", out_pwm: ", out_pwm
                 self.pid_last_error = err

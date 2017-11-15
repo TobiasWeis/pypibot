@@ -67,7 +67,7 @@ class BRAIN(MP):
                 print
 
                 if not free:
-                    self.md["Move"] = [0.2, "left"] # was 0-100, now 0-255
+                    self.md["Move"] = [0.3, "left"] # was 0-100, now 0-255
                 else:
                     self.md["Move"] = [0.3, "forward"]
 
